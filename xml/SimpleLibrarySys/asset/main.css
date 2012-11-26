@@ -1,0 +1,15 @@
+body{
+	font-family:黑体;
+	background-color:#eea;
+	margin:0 auto;
+	padding:0;
+	border:0 ;
+	-moz-border-bottom-colors:#abc;
+	-moz-border-left-colors:#abc;
+	-moz-border-right-colors:#abc;
+	-moz-border-top-colors:#abc;
+	border-bottom-colors:#abc;
+	border-left-colors:#abc;
+	border-right-colors:#abc;
+	border-top-colors:#abc;
+}
