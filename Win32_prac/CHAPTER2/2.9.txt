@@ -1,0 +1,174 @@
+I l@ve RuBoard    
+
+The Event Handler
+I don't know about you, but I'm starting to get the hang of this Windows stuff! It's not that bad. It's like a mystery novel梕xcept the mystery is figuring out what language the novel is written in! With that in mind, let's tackle the main event handler, or atleast take a first look at it. Remember, I mentioned that the event handler is a callback function called by Windows from the main event loop whenever an event occurs that your window must handle. Take a look at Figure 2.6 again to refresh your memory about the general data flow.
+
+This event handler is written by you, and it handles as many (or as few) events as you want to take care of. The rest you can pass on to Windows and let it deal with them. Of course, keep that in mind that the more events and messages your application handles, the more functionality it will have.
+
+Before we get into some code, though, let's talk about some of the details of the event handler, exactly what it does, and how it works. First, for each Windows class that you create, you can have a separate event handler that I will refer to as Windows' Procedure or simply WinProc from now on. The WinProc is sent messages from the main event loop as messages are received from the user or Windows and placed in the main event queue. That's a mental tongue twister, so I'll say it in another way…
+
+As the user and Windows perform tasks, events and messages are generated that are for your window and/or other applications' windows. All of these messages go into a queue, but the ones for your window are sent to your window's own private queue. Then the main event loop retrieves these messages and sends them to your window's WinProc to be processed.
+
+There are literally hundreds of possible messages and variations, so we aren't going to cover them all. Luckily, you only have to handle very few of them to get a Windows application up and running.
+
+So in a nutshell, the main event loop feeds the WinProc with messages and events, and the WinProc does something with them. Hence, not only do you have to worry about the WinProc, but also the main event loop. We will get to this shortly; for now, assume that the WinProc is simply going to be fed messages.
+
+Now that you know what the WinProc does, let's take a look at the prototype for it:
+
+LRESULT CALLBACK WindowProc(
+HWND hwnd, // window handle of sender
+UINT msg,  // the message id
+WPARAM wparam,  // further defines message
+LPARAM lparam); // further defines message
+
+Of course, this is just a prototype for the callback. You can call the function anything you want because you are only going to assign the function's address as a function pointer to winclass.lpfnWndProc, like this:
+
+winclass.lpfnWndProc = WindowProc;
+
+Remember? Anyway, the parameters are fairly self-explanatory:
+
+hwnd� This is the window handle and is only important if you have multiple windows open with the same Windows class. In that case, hwnd is the only way you can tell which messages are coming from which window. Figure 2.7 shows this possibility.
+
+Figure 2.7. Multiple windows based on the same class.
+
+
+msg� This is the actual message ID that the WinProc should handle. This ID may be one of dozens of main messages.
+
+wparam and lparam� These further qualify or subclass the message sent in the msg parameter.
+
+And finally, the return type, LRESULT, and declaration specifier, CALLBACK, are of interest. These keywords are a must, so don't forget them!
+
+So what most people do is switch() on the msg and then write code for each case. And based on msg, you will know if you need to further evaluate wparam and/or lparam. Cool? So let's take a look at some of the possible messages that might come through the WinProc, and then we'll see a bare-bones WinProc. Take a look at Table 2.11 to see a short list of some basic message IDs.
+
+Table 2.11. A Short List of Message IDs Value  Description  
+WM_ACTIVATE  Sent when a window is activated or becomes the focus.  
+WM_CLOSE  Sent when a window is closed.  
+WM_CREATE  Sent when a window is first created.  
+WM_DESTROY  Sent when a window is about to be destroyed.  
+WM_MOVE  Sent when a window has been moved.  
+WM_MOUSEMOVE  Sent when the mouse has been moved.  
+WM_KEYUP  Sent when a key is released.  
+WM_KEYDOWN  Sent when a key is pressed.  
+WM_TIMER  Sent when a timer event occurs.  
+WM_USER  Allows you to send messages.  
+WM_PAINT  Sent when a window needs repainting.  
+WM_QUIT  Sent when a Windows application is finally terminating.  
+WM_SIZE  Sent when a window has changed size.  
+
+
+Take a good look at Table 2.11 and read what all those messages are for. Basically, the WinProc will be sent one or more of these messages as the application runs. The message ID itself will be in msg, and any remaining info is stored in wparam and lparam. Thus, it's always a good idea to reference the online Win32 SDK Help to see what all the parameters of a particular message do.
+
+Fortunately, we are only interested in three messages right now:
+
+WM_CREATE� This message is sent when the window is first created and gives you a chance to do any setup, initialization, or resource allocation.
+
+WM_PAINT� This message is sent whenever your window's contents need repainting. This can occur for a number of reasons: the window was moved or resized by the user, another application popped up and obscured yours, and so on.
+
+WM_DESTROY� This message is sent to your window when the window is about to be destroyed. Usually, this is a direct result of the user clicking the window's close icon or closing from the window's system menu. Either way, this is where you should deallocate all the resources and tell Windows to terminate the application completely by sending a WM_QUIT message yourself梞ore on this later.
+
+So without further ado, let's see a complete WinProc that handles all these messages:
+
+LRESULT CALLBACK WindowProc(HWND hwnd,
+                            UINT msg,
+                            WPARAM wparam,
+                            LPARAM lparam)
+{
+// this is the main message handler of the system
+PAINTSTRUCT    ps;    // used in WM_PAINT
+HDC        hdc;    // handle to a device context
+
+// what is the message
+switch(msg)
+    {
+    case WM_CREATE:
+        {
+    // do initialization stuff here
+
+        // return success
+    return(0);
+    } break;
+
+    case WM_PAINT:
+    {
+    // simply validate the window
+    hdc = BeginPaint(hwnd,&ps);
+    // you would do all your painting here
+        EndPaint(hwnd,&ps);
+
+
+        // return success
+    return(0);
+    }  break;
+
+    case WM_DESTROY:
+    {
+    // kill the application, this sends a WM_QUIT message
+    PostQuitMessage(0);
+
+        // return success
+    return(0);
+    } break;
+
+    default:break;
+
+    } // end switch
+
+// process any messages that we didn't take care of
+return (DefWindowProc(hwnd, msg, wparam, lparam));
+
+} // end WinProc
+
+As you can see, the function is composed of empty space for the most part梬hich is a good thing! Let's begin with the processing of WM_CREATE. Here, all the function does is return(0). This simply tells Windows that you handled it, so don't take any more actions. Of course, you could have done all kinds of initialization in the WM_CREATE message, but that's up to you.
+
+The next message, WM_PAINT, is very important. This message is sent whenever your window needs repainting. This usually means that you have to do the repainting. For DirectX games, this isn't going to matter because you are going to redraw the screen 30 to 60 fps (frames per second). But for a normal Windows application, it does matter. I'm going to cover WM_PAINT in much more detail in the next chapter, but for now just tell Windows that you did repaint the window, so it can stop sending WM_PAINT messages.
+
+To accomplish this feat, you must validate the client rectangle of the window. There are a number of ways to do this, but the simplest is to put a call to BeginPaint()�EndPaint(). This calling pair validates the window and fills the background with the background brush previously stored in the Windows class variable hbrBackground. Once again, here's the code for the validation:
+
+// begin painting
+hdc = BeginPaint(hwnd,&ps);
+// you would do all your painting here
+EndPaint(hwnd,&ps);
+
+There are a couple of things going on here that I want to address. First, notice that the first parameter to each call is the window handle hwnd. This is necessary because the BeginPaint()�EndPaint() functions can potentially paint in any window of your application, so the window handle indicates which one you're interested in messing with. The second parameter is the address of a PAINTSTRUCT structure that contains the rectangle that you must redraw. Here's what a PAINTSTRUCT looks like:
+
+typedef struct tagPAINTSTRUCT
+        {
+        HDC  hdc;
+        BOOL fErase;
+        RECT rcPaint;
+        BOOL fRestore;
+        BOOL fIncUpdate;
+        BYTE rgbReserved[32];
+        } PAINTSTRUCT;
+
+You don't really need to worry about this until later, when we talk about the Graphics Device Interface or GDI. But the most important field is rcPaint, which is a RECT structure that contains the minimum rectangle that needs to be repainted. Take a look at Figure 2.8 to see this. Notice that Windows tries to do the least amount of work possible, so when the contents of a window are mangled, Windows at least tries to tell you the smallest rectangle that you can repaint to restore the contents. And if you're interested in the RECT structure, it's nothing more than the four corners of a rectangle, as shown here:
+
+typedef struct tagRECT
+        {
+        LONG left;    // left x-edge of rect
+        LONG top;     // top y-edge of rect
+        LONG right;   // right x-edge of rect
+        LONG bottom;  // bottom y-edge of rect
+        } RECT;
+
+Figure 2.8. Repainting the invalid region only.
+
+
+And the last thing that you'll notice about the call to BeginPaint() is that it returns a handle to a graphics context or hdc:
+
+HDC hdc; // handle to graphics context
+hdc = BeginPaint(hwnd,&ps);
+
+A graphics context is a data structure that describes the video system and drawing surface. It's magic, as far as we are concerned; you just have to retrieve one if you want to do any graphics. That's about it for the WM_PAINT message梖or now.
+
+The WM_DESTROY message is actually quite interesting. WM_DESTROY is sent when the user closes the window. However, this only closes the window, not the application. The application will continue to run, but without a window. You need to do something about this. In most cases, when the user kills the main window, he intends for the application to terminate. Thus, you must facilitate this by sending a message yourself! The message is called WM_QUIT. And since this message is so common, there's a function to send it for you, called PostQuitMessage().
+
+All you need to do in the WM_DESTROY handler is clean up everything and then tell Windows to terminate your application with a call to PostQuitMessage(0). This, in turn, puts a WM_QUIT into the message queue, which at some point causes the main event loop to bail.
+
+There are a couple of details you should know about in the WinProc handler we have been analyzing. First, I'm sure you have noticed the return(0) after each handler body. This serves two purposes: to exit the WinProc and to tell Windows that you handled the message. The second important detail is the default message handler, DefaultWindowProc(). This function is a passthrough that passes messages that you don't process onto Windows for default processing. Therefore, if you don't handle the message, make sure to always end all your event handler functions with a call like this:
+
+// process any messages that we didn't take care of
+return (DefWindowProc(hwnd, msg, wparam, lparam));
+
+I know this may all seem like overkill and more trouble than it's worth. Nevertheless, once you have a basic Windows application skeleton, you just copy it and add your own code. My main goal, as I said, is to help you create a DOS32-looking game console that you can use and almost forget that any Windows stuff is going on. Anyway, let's move on to the last part the main event loop.
+ 

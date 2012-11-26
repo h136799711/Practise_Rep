@@ -1,0 +1,645 @@
+Using Resources
+One of the main design issues that the creators of Windows wanted to address was storing more than just the program code in a Windows application (even Mac programs do this). They reasoned that the data for a program should also reside within the program's .EXE file. This isn't a bad idea for a number of reasons:
+
+A single .EXE that contains both code and data is simpler to distribute.
+
+If you don't have external data files, you can't lose them.
+
+Outside forces can't easily access your data files梥uch as .BMPs, .WAVs, and so on梐nd hack, jack, and distribute them around the planet.
+
+To facilitate this kind of database technology, Windows programs support what are called resources. These are simply pieces of data combined with your program code that can be loaded in later during runtime by the program itself. Figure 3.1 depicts this concept.
+
+Figure 3.1. The relationship of resources to a Windows application.
+
+
+So what kind of resources are we talking about here? Well, in reality, there is no limit to the types of data you can compile into your program because Windows programs support user-defined resource types. However, there are some predefined types that should take care of most of your needs:
+
+Icons桽mall bitmapped images used in a number of places, such as the image that you click on to run a program within a directory. Icons use the .ICO file extension.
+
+Cursor桝 bitmap that represents the mouse pointer. Windows allows you to manipulate cursors in a number of ways. For example, you might want the cursor to change as it is moved from window to window. Cursors use the .CUR file extension.
+
+String桾he string resource might not be so obvious a choice for a resource. You might say, "I usually put strings into my program anyway, or in a data file." I can see your point. Nevertheless, Windows allows you to place a table of strings in your program as a resource and to access them via IDs.
+
+Sound桵ost Windows programs make at least minimal use of sounds via .WAV files. Hence, .WAV files can be added to your resources, too. This is a great way to keep people from hijacking your sound effects!
+
+Bitmap桾hese are the standard bitmaps that you would imagine: a rectangular matrix of pixels in monochrome or 4-, 8-, 16-, 24-, or 32-bit format. They are very common objects in graphical operating systems such as Windows, so they can be added as resources also. Bitmaps use the .BMP file extension.
+
+Dialog桪ialog boxes are so common in Windows that the designers decided to make them a resource rather than something that is loaded externally. Good idea! Therefore, you can either create dialog boxes on-the-fly with code, or design them with an editor and store them as a resource.
+
+Metafile桵etafiles are a bit advanced. They allow you to record a sequence of graphical operations in a file and then play the file back.
+
+Now that you have an idea of what resources are and the types that exist, the next question is, how does it all go together? Well, there is a program called a resource compiler. It takes as input an ASCII text resource file with the extension .RC. This file is a C/English杔ike description of all the resources you want to compile into a single data file. The resource compiler then loads all the resources and places them into one big data file with the extension .RES.
+
+This .RES file contains all the binary data making up whichever icons, cursors, bitmaps, sounds, and so forth that you may have defined in the .RC resource file. Then the .RES file is taken, along with your .CPP, .H, .LIB, .OBJ, and so on, and compiled into one .EXE, and that's it! Figure 3.2 illustrates the data flow possibilities of this process.
+
+Figure 3.2. The data flow of resources during compilation and linking.
+
+
+Putting Your Resources Together
+Back in the old days, you would use an external resource compiler like RC.EXE to compile all your resources together. But these days, the compiler IDE does all this for you. Hence, if you want to add a resource to your program, you can simply add it by selecting New (in most cases) from the File menu in your IDE and then selecting the resource type you want to add (more on this later).
+
+Let's review what the deal is with resources: You can add a number of data types and objects to your program, and they will reside as resources within the .EXE itself (somewhere at the end), along with the actual computer code. Then, during runtime, you can access this resource database and load resource data from your program itself instead of from the disk as separate files. Furthermore, to create the resource file, you must have a resource description file that is in ASCII text and named *.RC. This file is then fed to the compiler (along with access to the resources) and a *.RES file is generated. This .RES file is then linked together with all your other program objects to create a final .EXE. It's as simple as that! Yeah, right, and I'm a billionaire!
+
+With all that in mind, let's cover a number of resource objects and see how to create them and load them into our programs. I'm not going to cover all the resources previously mentioned, but you should be able to figure out any others with the information here. They all work in the same manner, give or take a data type, handle, or psychotic episode of staying up all night and not sleeping.
+
+Using Icon Resources
+There are only two files that you need to create to work with resources: an .RC file and possibly an .H file, if you want to make references to symbolic identifiers in the .RC file. I'll cover this detail in the following pages. Of course, ultimately you need to generate an .RES file, but we'll let the compiler IDE do this.
+
+As an example of creating an ICON resource, let's see how to change the icon that the application uses on the taskbar and the one next to the system menu on the window itself. If you recall, you set these icons during the creation of the Windows class with the following lines of code:
+
+winclass.hIcon      = LoadIcon(NULL, IDI_APPLICATION);
+winclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+These lines of code load the default application icon for both the normal icon and the small version of the icon. However, you can load any icon you want into these slots by using icons that have been compiled into a resource file.
+
+First, you need an icon to work with… I have created a cool icon to use for all the applications in this book. It's called T3DX.ICO and is shown in Figure 3.3. I created the icon using VC++ 6.0's Image Editor, which is shown in Figure 3.4. However, you can create icons, cursors, bitmaps, and so on with any program you want (as long as it supports the export type).
+
+Figure 3.3. The T3DX.ICO icon bitmap.
+
+
+Figure 3.4. The VC++ 6.0 Image Editor.
+
+
+T3DX.ICO is 32 pixels x 32 pixels, with 16 colors. Icons can range in size from 16x16 to 64x64, with up to 256 colors. However, most icons are 32x32 with 16 colors, so let's stick to that for now.
+
+Once you have the icon that you're interested in placing into a resource file, you need to create a resource file to place it in. To keep things simple, you're going to do everything by hand. (Remember that the compiler IDE will do all this stuff for you梑ut then you wouldn't learn anything, right?)
+
+The .RC file contains all the resource definitions, meaning that you can have more than one resource in your program.
+
+NOTE
+
+Before I show you any code, I want to make a very important point about resources. Windows uses either ASCII text strings or integer IDs to refer to resources. In most cases, you can use both in your .RC files. However, some resources only allow you to use one or the other. In either case, the resources must be loaded in a slightly different way, and if IDs are involved, an extra .H file containing the symbolic cross-references must also be included in your project.
+
+
+
+Here's how you would define an ICON resource in your .RC script file:
+
+Method 1桞y string name:
+
+icon_name ICON FILENAME.ICO
+
+Examples:
+
+windowicon ICON star.ico
+MyCoolIcon ICON cool.ico
+
+or
+
+Method 2桞y integer ID:
+
+icon_id ICON FILENAME.ICO
+
+Examples:
+
+windowicon ICON star.ico
+124 ICON ship.ico
+
+Here's the confusing part: Notice that there aren't any quotes at all in method 1. This is a bit of a problem and will cause you much grief, so listen up. You might have noticed that the first example in each method of the ICON definitions looks exactly the same. However, one of them is interpreted as "windowicon" and the other as the symbol windowicon. What makes this happen is an additional file that you literally include in the .RC file (and your application's .CPP file) that defines any symbolic constants. When the resource compiler parses the following line of code,
+
+windowicon ICON star.ico
+
+it takes a look at any symbols that have been defined via include header files. If the symbol exists, the resource compiler then refers to the resource numerically by the integer ID that the symbol resolves to. Otherwise, the resource compiler assumes it's a string and refers to the ICON by the string "windowicon".
+
+Thus, if you want to define symbolic ICONs in your .RC resource script, you also need an .H file to resolve the symbolic references. To include the .H file in the .RC script, you use the standard C/C++ #include keyword.
+
+For example, suppose that you want to define three symbolic ICONs in your .RC file, which we'll name RESOURCES.RC. You'll also need an .H file, which we'll name RESOURCES.H. Here's what the contents of each file would look like:
+
+Contents of RESOURCES.H:
+
+#define ID_ICON1       100 // these numbers are arbitrary
+#define ID_ICON2       101
+#define ID_ICON3       102
+
+Contents of RESOURCES.RC:
+
+#include "RESOURCES.H"
+
+// here are the icon defines, note the use of C++ comments
+
+ID_ICON1 ICON star.ico
+ID_ICON2 ICON ball.ico
+ID_ICON3 ICON cross.ico
+
+That's it. Then you would add RESOURCES.RC to your project and make sure to #include RESOURCES.H in your application file, and you would be ready to rock and roll! Of course, the .ICO files must be in the working directory of your project so the resource compiler can find them.
+
+Now, if you didn't #define the symbols for the icons and include an .H file, the resource compiler would just assume that the symbols ID_ICON1, ID_ICON2, and ID_ICON3 were literal strings. That's how you would refer to them in the program�"ID_ICON1", "ID_ICON2", and "ID_ICON3".
+
+Now that I have completely upset the time/space continuum with all this stuff, let's back up to what you were trying to do梛ust load a simple icon!
+
+To load an icon by string name, do the following:
+
+In an .RC file:
+
+your_icon_name ICON filename.ICO
+
+In program code:
+
+// Notice the use of hinstance instead of NULL.
+winclass.hIcon      = LoadIcon(hinstance, "your_icon_name");
+winclass.hIconSm = LoadIcon(hinstance, "your_icon_name");
+
+And to load by symbolic reference, you would #include the header containing the references to the symbols, as in the preceding example:
+
+In an .H file:
+
+#define ID_ICON1       100 // these numbers are arbitrary
+#define ID_ICON2       101
+#define ID_ICON3       102
+
+In an .RC file:
+
+// here are the icon defines, note the use of C++ comments
+ID_ICON1 ICON star.ico
+ID_ICON2 ICON ball.ico
+ID_ICON3 ICON cross.ico
+
+And then the program code would look like this:
+
+// Notice the use of hinstance instead of NULL.
+// use the MAKEINTRESOURCE macro to reference
+// symbolic constant resource properly
+winclass.hIcon      = LoadIcon(hinstance,MAKEINTRESOURCE(ID_ICON1));
+winclass.hIconSm =  LoadIcon(hinstance,MAKEINTRESOURCE(ID_ICON1));
+
+Notice the use of the macro MAKEINTRESOURCE(). This macro converts the integer into a string pointer, but don't worry about that梛ust use it when using #defined symbolic constants.
+
+Using Cursor Resources
+Cursor resources are almost identical to ICON resources. Cursor files are small bitmaps with the extension .CUR and can be created in most compiler IDEs or with separate image processing programs. Cursors are usually 32x32 with 16 colors, but they can be up to 64x64 with 256 colors and even animated!
+
+Assuming that you have created a cursor file with your IDE or a separate paint program, the steps to add them to an .RC file and access them via your program are similar to the steps for ICONs. To define a cursor, use the CURSOR keyword in your .RC file.
+
+Method 1桞y string name:
+
+cursor_name CURSOR FILENAME.CUR
+
+Examples:
+
+windowcursor CURSOR crosshair.cur
+
+MyCoolCursor CURSOR greenarrow.cur
+
+or
+
+Method 2桞y integer ID:
+
+cursor_id CURSOR FILENAME.CUR
+
+Examples:
+
+windowcursor CURSOR bluearrow.cur
+
+292 CURSOR redcross.cur
+
+Of course, if you use symbolic IDs, you must create an .H file with the symbol's defines.
+
+Contents of RESOURCES.H:
+
+#define ID_CURSOR_CROSSHAIR   200 // these numbers are arbitrary
+#define ID_CURSOR_GREENARROW  201
+
+Contents of RESOURCES.RC:
+
+#include "RESOURCES.H"
+
+// here are the icon defines, note the use of C++ comments
+ID_CURSOR_CROSSHAIR CURSOR crosshair.cur
+ID_CURSOR_GREENARROW CURSOR greenarrow.cur
+
+And there isn't any reason why a resource data file can't exist in another directory. For example, the greenarrow.cur might exist in the root directory in a CURSOR\ directory, like this:
+
+ID_CURSOR_GREENARROW CURSOR C:\CURSOR\greenarrow.cur
+
+TRICK
+
+I have created a few cursor .ICO files for this chapter. Try looking at them with your IDE, or just open up the directory and Windows will show the bitmap of each one by its filename!
+
+
+
+Now that you know how to add a CURSOR resource to an .RC file, here's the code to load the resource from the application by string name only.
+
+In an .RC file:
+
+CrossHair CURSOR crosshair.CUR
+
+In program code:
+
+// Notice the use of hinstance instead of NULL.
+winclass.hCursor = LoadCursor(hinstance, "CrossHair");
+
+And to load a cursor with a symbolic ID defined in an .H file, here's what you would do:
+
+In an .H file:
+
+#define ID_CROSSHAIR   200
+
+In an .RC file:
+
+ID_CROSSHAIR CURSOR crosshair.CUR
+
+In program code:
+
+// Notice the use of hinstance instead of NULL.
+winclass.hCursor = LoadCursor(hinstance, MAKEINTRESOURCE(ID_CROSSHAIR));
+
+Again, you use the MAKEINTRESOURCE() macro to convert the symbolic integer ID into the form Windows wants.
+
+All right, there's one little detail that may not have crossed your mind. So far you have only messed with the Windows class icon and cursor. But is it possible to manipulate the window icon and cursor at the window level? For example, you might want to create two windows and make the cursor change in each one. To do this, you could use this SetCursor() function:
+
+HCURSOR SetCursor(HCURSOR hCursor);
+
+Here, hCursor is the handle of the cursor retrieved by LoadCursor(). The only problem with this technique is that SetCursor() isn't that smart, so your application must do the tracking and change the cursor as the mouse moves from window to window. Here's an example of setting the cursor:
+
+// load the cursor somewhere maybe in the WM_CREATE
+HCURSOR hcrosshair = LoadCursor(hinstance, "CrossHair");
+
+// later in program code to change the cursor...
+SetCursor(hcrosshair);
+
+For an example of both setting the window icon and the mouse cursor, take a look DEMO3_1.CPP on the CD-ROM. The following list contains excerpts of the important code sections that load the new icon and cursor:
+
+// include resources
+#include "DEMO3_1RES.H"
+.
+.
+// changes to the window class definition
+winclass.hIcon=
+    LoadIcon(hinstance, MAKEINTRESOURCE(ICON_T3DX));
+winclass.hCursor =
+    LoadCursor(hinstance, MAKEINTRESOURCE(CURSOR_CROSSHAIR));
+winclass.hIconSm = LoadIcon(hinstance, MAKEINTRESOURCE(ICON_T3DX));
+
+Furthermore, the program uses the resource script named DEMO3_1.RC and the resource header named DEMO3_1RES.H.
+
+Contents of DEMO3_1RES.H:
+
+#define ICON_T3DX                 100
+#define CURSOR_CROSSHAIR          200
+
+Contents of DEMO3_1.RC:
+
+#include "DEMO3_1RES.H"
+
+// note that this file has different types of resources
+ICON_T3DX        ICON   t3dx.ico
+CURSOR_CROSSHAIR CURSOR crosshair.cur
+
+To build the application yourself, you'll need the following:
+
+
+DEMO3_1.CPP� The main C/C++ file
+
+
+
+DEMO3_1RES.H� The header with the symbols defined in it
+
+
+
+DEMO3_1.RC� The resource script itself
+
+
+
+T3DX.ICO� The bitmap data for the icon
+
+
+
+CROSSHAIR.CUR� The bitmap data for the cursor
+
+
+All these files should be in the same directory as your project. Otherwise, the compiler and linker will have trouble finding them. Once you create and run the program or use the precompiled DEMO3_1.EXE, you should see something like what's shown in Figure 3.5. Pretty cool, huh?
+
+Figure 3.5. The output of DEMO3_1.EXE with custom ICON and CURSOR.
+
+
+As an experiment, try opening the DEMO3_1.RC file with your IDE. Figure 3.6 shows what VC++ 6.0 does when I do this. However, you may get different results with your particular compiler, so don't tweak if it doesn't look the same. Alas, there is one point I want to make about the IDE before moving on. As I said, you can use the IDE to create both the .RC and .H file, but you'll have to read the manual on this yourself.
+
+Figure 3.6. The results of opening the resource file DEMO3_1.RC in VC++ 6.0.
+
+
+However, there is one problem with loading a handmade .RC file梚f you save it with your IDE, it will undoubtedly be inflicted with a zillion comments, macros, #defines, and other garbage that Windows compilers like to see in .RC files. Thus, the moral of the story is that if you want to edit your handmade .RC files, do the editing by loading the .RC file as text. That way the compiler won't try to load it as an .RC, but just as plain ASCII text.
+
+Creating String Table Resources
+As I mentioned in the introduction, Windows supports string resources. Unlike other resources, you can only have one string table that must contain all your strings. Furthermore, string resources do not allow definition by string. Therefore, all string tables defined in your .RC files must be accompanied by symbolic reference constants and the associated .H header file to resolve the references.
+
+I'm still not sure how I feel about string resources. Using them is equivalent to just using header files, and in either case梥tring resources or plain header files梱ou have to recompile. So I don't see the need for them! But if you really want to get complicated, you can put string resources into .DLLs and the main program doesn't have to be recompiled. However, I'm a scientist, not a philosopher, so who cares?
+
+To create a string table in your .RC file, you must use the following syntax:
+
+STRINGTABLE
+{
+ID_STRING1, "string 1"
+ID_STRING2, "string 2"
+.
+.
+}
+
+Of course, the symbolic constants can be anything, as can the strings within the quotes. However, there is one rule: No line can be longer than 255 characters梚ncluding the constant itself.
+
+Here's an example of an .H and .RC file containing a string table that you might use in a game for the main menu. The .H file contains
+
+// the constant values are up to you
+#define ID_STRING_START_GAME       16
+#define ID_STRING_LOAD_GAME        17
+#define ID_STRING_SAVE_GAME        18
+#define ID_STRING_OPTIONS          19
+#define ID_STRING_EXIT             20
+
+The .RC file contains
+
+// note the stringtable does not have a name since
+// only one stringtable is allowed per .RC file
+STRINGTABLE
+{
+ID_STRING_START_GAME,    "Kill Some Aliens"
+ID_STRING_LOAD_GAME,     "Download Logs"
+ID_STRING_SAVE_GAME,     "Upload Data"
+ID_STRING_OPTIONS,       "Tweak The Settings"
+ID_STRING_EXIT,          "Let's Bail!"
+}
+
+TIP
+
+You can put almost anything you want in the strings, including printf() command specifiers like %d, %s, etc. You can't use escape sequences like "\n", but you can use octal sequences like \015 and so on.
+
+
+
+Once you have created your resource files containing the string resources, you can use the LoadString() function to load in a particular string. Here's its prototype:
+
+int LoadString(HINSTANCE hInstance,//handle of module withstring resource
+               UINT uID,           //resource identifier
+               LPTSTR lpBuffer,    //address of buffer for resource
+               int nBufferMax);    //size of buffer
+
+LoadString() returns the number of characters read, or 0 if the call was unsuccessful. Here's how you would use the function to load and save game strings during runtime:
+
+// create some storage space
+char load_string[80], // used to hold load game string
+     save_string[80]; // used to hold save game string
+
+// load in the first string and check for error
+if (!LoadString(hinstance, ID_STRING_LOAD_GAME, load_string,80))
+   {
+   // there's an error!
+   } // end if
+
+// load in the second string and check for error
+if (!LoadString(hinstance, ID_STRING_SAVE_GAME, save_string,80))
+   {
+   // there's an error!
+   } // end if
+
+// use the strings now
+
+As usual, hinstance is the instance of your application as passed in WinMain().
+
+That wraps it up for string resources. If you can find a good use for them, email me at ceo@xgames3d.com!
+
+Using Sound .WAV Resources
+By now you're either getting very comfortable with resource scripting or you're so upset that you're about to hack into my Web site and destroy me. Remember, it wasn't me梚t was Microsoft (http://www.microsoft.com) that invented all this stuff. I'm just trying to make sense of it too!
+
+All right, dog. Now that I've given you my occasional disclaimer, let's continue by loading some sound resources!
+
+Most games use one of two types of sounds:
+
+Digital .WAV files
+
+MIDI .MID music files
+
+To my knowledge, the standard resources for Windows only support .WAV files, so I'm only going to show you how to create .WAV resources. However, even if .MIDs aren't supported, you can always create a user-defined resource type. I'm not going to go into this, but the ability to do so is there.
+
+The first thing you need is a .WAV file, which is simply a digital waveform of data that contains a number of 8- or 16-bit samples at some frequency. Typical sample frequencies for game sound effects are 11KHz, 22KHz, and 44KHz (for CD-level quality).
+
+This stuff doesn't concern you yet, but I just wanted to give you a heads up. You'll learn all about digital sampling theory and .WAV files when we cover DirectSound. But for now, just know that sample size and rate are issues.
+
+With that in mind, let's assume that you have a .WAV file on disk, and you want to add it to a resource file and be able to load and play it programmatically. Okay, let's go! The resource type for .WAV files is WAVE梩here's a surprise. To add it to your .RC file, you would use the following syntax.
+
+Method 1桞y string name:
+
+wave_name WAVE FILENAME.WAV
+
+Examples:
+
+BigExplosion WAVE expl1.wav
+
+FireWeapons  WAVE fire.wav
+
+Method 2桞y integer ID:
+
+ID_WAVE WAVE FILENAME.WAV
+
+Examples:
+
+DEATH_SOUND_ID WAVE die.wav
+20             WAVE intro.wav
+
+Of course, the symbolic constants would have to be defined elsewhere in an .H file, but you knew that!
+
+At this point, we run into a little snag: WAVE resources are a little more complex than cursors, icons, and string tables. The problem is, to load them in takes a lot more programming than the other resources, so I'm going to hold off on showing you the way to load .WAV resources in a real game until later. For now, I'm just going to show you a trick to load and play a .WAV on-the-fly using the PlaySound() function. Here's its prototype:
+
+BOOL PlaySound(LPCSTR pszSound, // string of sound to play
+               HMODULE hmod,    // instance of application
+               DWORD fdwSound); // flags parameter
+
+Unlike LoadString(), PlaySound() is a little more complex, so let's take a closer look at each of the parameters:
+
+pszSound� This parameter is either the string name of the sound resource in the resource file or a filename on disk. Also, you can use the MAKEINTRESOURCE() and use a WAVE that is defined with a symbolic constant.
+
+hmod� The instance of the application to load the resource from. This is simply the hinstance of the application.
+
+fdwSound� This is the clincher. This parameter controls how the sound is loaded and played. Table 3.1 contains a list of the most useful values for fdwSound.
+
+Table 3.1. Values for the fdwSound Parameter of PlaySound() Value  Description  
+SND_FILENAME  The pszSound parameter is a filename.  
+SND_RESOURCE  The pszSound parameter is a resource identifier; hmod must identify the instance that contains the resource.  
+SND_MEMORY  A sound event's file is loaded in RAM. The parameter specified by pszSound must point to an image of a sound in memory.  
+SND_SYNC  Synchronous playback of a sound event. PlaySound() returns after the sound event is completed.  
+SND_ASYNC  The sound is played asynchronously, and PlaySound() returns immediately after beginning the sound. To terminate an asynchronously played waveform sound, call PlaySound() with pszSound set to NULL.  
+SND_LOOP  The sound plays repeatedly until PlaySound() is called again with the pszSound parameter set to NULL. You must also specify the SND_ASYNC flag to indicate an asynchronous sound event.  
+SND_NODEFAULT  No default sound event is used. If the sound cannot be found, PlaySound() returns silently without playing the default sound.  
+SND_PURGE  Sounds are to be stopped for the calling task. If pszSound is not NULL, all instances of the specified sound are stopped. If pszSound is NULL, all sounds that are playing on behalf of the calling task are stopped.  
+SND_NOSTOP  The specified sound event will yield to another sound event that is already playing. If a sound cannot be played because the resource needed to generate that sound is busy playing another sound, the function immediately returns FALSE without playing the requested sound.  
+SND_NOWAIT  If the driver is busy, the function returns immediately without playing the sound.  
+
+
+To play a WAVE sound resource with PlaySound(), there are four general steps:
+
+Create the .WAV file itself and store it on disk.
+
+Create the .RC resource script and associated H file.
+
+Compile the resources along with your program code.
+
+In your program, make a call to PlaySound() with either the WAVE resource name or the WAVE resource ID using the MAKEINTRESOURCE() macro.
+
+Let's see some examples, shall we? Let's begin with a general RC file that has two sounds: one with a string name and the other with a symbolic constant. Let's name them RESOURCE.RC and RESOURCE.H. The files would look something like this:
+
+The RESOURCE.H file would contain
+
+#define SOUND_ID_ENERGIZE   1
+
+The RESOURCE.RC file would contain
+
+#include  "RESOURCE.H"
+
+// first the string name defined sound resource
+Telporter WAVE teleport.wav
+
+// and now the symbolically defined sound
+SOUND_ID_ENERGIZE WAVE energize.wav
+
+Within your program, here's how you would play the sounds in different ways:
+
+// to play the telport sound asynchronously
+PlaySound("Teleporter", hinstance,
+           SND_ASYNC | SND_RESOURCE);
+
+// to play the telport sound asynchronously with looping
+PlaySound("Teleporter", hinstance,
+            SND_ASYNC | SND_LOOP | SND_RESOURCE);
+
+// to play the energize sound asynchronously
+PlaySound(MAKEINTRESOURCE(SOUND_ID_ENERGIZE), hinstance,
+          SND_ASYNC | SND_RESOURCE);
+
+// and if you simply wanted to play a sound off disk
+// directly then you could do this
+PlaySound("C:\path\filename.wav", hinstance,
+          SND_ASYNC | SND_FILENAME);
+
+And to stop all sounds, use the SND_PURGE flag with NULL as the sound name, like this:
+
+// stop all sounds
+PlaySound(NULL, hinstance, SND_PURGE);
+
+Obviously, there are myriad flags options that you should feel free to experiment with. Anyway, you don't have any controls or menus yet, so it's hard to interact with the demo applications. However, as a simple demo of using sound resources, I have created DEMO3_2.CPP, which you can find on the disk. I would list it here, but 99 percent of it is just the standard template you have been using, and the sound code is nothing more than a couple lines of code identical to the earlier examples. The demo is precompiled, and you can run DEMO3_2.EXE yourself to see what it does.
+
+However, I do want to show you the .RC and .H files that it uses. They are DEMO3_2.RC and DEMO3_2RES.H, respectively:
+
+Contents of DEMO3_2RES.H:
+
+// defines for sound ids
+#define SOUND_ID_CREATE      1
+#define SOUND_ID_MUSIC       2
+
+// defines for icons
+#define ICON_T3DX            500
+
+// defines for cursors
+#define CURSOR_CROSSHAIR     600
+
+Contents of DEMO3_2.RC:
+
+#include "DEMO3_2RES.H"
+
+
+// the sound resources
+SOUND_ID_CREATE   WAVE create.wav
+SOUND_ID_MUSIC    WAVE techno.wav
+
+// icon resources
+ICON_T3DX ICON T3DX.ICO
+
+// cursor resources
+CURSOR_CROSSHAIR CURSOR CROSSHAIR.CUR
+
+You'll notice that I have also included the ICON and CURSOR resources just to make things a little more exciting.
+
+To make DEMO3_2.CPP, I took the standard Window demo we have been working with and added calls to sound code in two places: the WM_CREATE message and the WM_DESTROY message. In WM_CREATE, I start two sound effects. One of them says Creating window and stops, and the other is a short song in loop mode so it will continue to play. Then, in the WM_DESTROY section, I stop all sounds.
+
+NOTE
+
+I used the SND_SYNC flag as one of the flags for the first sound. This flag is needed because you are only allowed to play one sound at a time with PlaySound(), and I didn't want the second sound to stop the first one in midplay.
+
+
+
+Here's the added code to the WM_CREATE and WM_DESTROY messages from DEMO3_2.CPP:
+
+    case WM_CREATE:
+        {
+        // do initialization stuff here
+
+        // play the create sound once
+        PlaySound(MAKEINTRESOURCE(SOUND_ID_CREATE),
+                  hinstance_app, SND_RESOURCE | SND_SYNC);
+
+        // play the music in loop mode
+        PlaySound(MAKEINTRESOURCE(SOUND_ID_MUSIC),
+                  hinstance_app, SND_RESOURCE | SND_ASYNC | SND_LOOP);
+
+        // return success
+    return(0);
+    } break;
+
+
+    case WM_DESTROY:
+    {
+        // stop the sounds first
+        PlaySound(NULL, hinstance_app, SND_PURGE);
+
+        // kill the application, this sends a WM_QUIT message
+        PostQuitMessage(0);
+
+        // return success
+    return(0);
+    } break;
+
+Also, you'll notice that there is a variable, histance_app, used as the instance handle to the application in the PlaySound() calls. This is simply a global that saves the hinstance sent in WinMain(). It is coded right after the class definition in WinMain(), like this:
+
+.
+.
+// save hinstance in global
+hinstance_app = hinstance;
+
+// register the window class
+if (!RegisterClassEx(&winclass))
+    return(0);
+.
+.
+
+To build this application, you'll need the following files in your project:
+
+
+DEMO3_2.CPP� The main source file.
+
+
+
+DEMO3_2RES.H� The header file contains all the symbols.
+
+
+
+DEMO3_2.RC� The resource script itself.
+
+
+
+TECHNO.WAV� The music clip, which just needs to be in the working directory.
+
+
+
+CREATE.WAV� The creating window vocalization, which needs to be the in working directory.
+
+
+
+WINMM.LIB� The Windows Multimedia Library Extensions. This file is found in your compiler's LIB\ directory. You should add it to all projects from here on out.
+
+
+
+MMSYSTEM.H� The header for WINMM.LIB. This is already included as part of DEMO3_2.CPP, and all my demos, for that matter. All you need to know is that you need it in your compiler's search path. It is part of the standard Win32 header file collection.
+
+
+Last, But Not Least桿sing the Compiler to Create .RC Files
+Most compilers that generate Windows applications come with a quite extensive development environment, such as Microsoft's Visual Development Studio and so on. Each of these IDEs contains one or more tools to create various resources, resource scripts, and the associated headers automatically and/or with drag-and-drop technology.
+
+The only problem with using these tools is that you have to learn them! Moreover, .RC files created with the IDE are in human-readable ASCII, but they have a great deal of added #defines and macros that the compiler adds to help automate and simplify the selection of constants and interfacing to MFC (wash your mouth out).
+
+Since I'm a Microsoft VC++ 6.0 user these days, I'll briefly cover some key elements of using VC++ 6.0's resource manipulation support. First, there are two ways that you can add resources to your project:
+
+Method 1桿sing the File, New option from the main menu, you can add a number of resources to your project. Figure 3.7 is a screen shot of the dialog that comes up. When you add resources like icons, cursors, and bitmaps, the compiler IDE will automatically launch the Image Editor (as shown back in Figure 3.4). This is a crude image editing utility that you can use to draw your cursors and icons. If you add a menu resource (which we will get to in the next section), the menu editor will appear.
+
+Figure 3.7. Adding resources with File, New in VC++ 6.0.
+
+
+Method 2桾his is a bit more flexible and contains all possible resource types, whereas method 1 only supports a few. To add any type of resource to your project, you can use the Insert, Resource option on the main menu. The dialog that appears is shown in Figure 3.8. However, this method does some stuff under the hood. Whenever you add a resource, you must add it to a resource script梤ight? Therefore, if your project doesn't already have a resource script, the compiler IDE will generate one for you and call it SCRIPT*.RC. In addition, both methods will end up generating (and/or modifying) a file named RESOURCE.H. This file contains the resource symbols, ID values, and so on that you define with the editor(s) in relation to resources.
+
+Figure 3.8. Using Insert, Resource to add resources to your application.
+
+
+I would like to delve much more into the area of resource editing via the IDE, but it's really a topic for an entire chapter梚f not a whole book. Please review your particular compiler's documentation on the subject. We aren't going to use many resources in this book, so the info I have already given you will suffice. Let's move on to a more complex type of resource梩he menu.

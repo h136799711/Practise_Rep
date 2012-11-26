@@ -1,0 +1,218 @@
+The World's Simplest Windows Program
+Now that you have a general overview of the Windows OS and some of its properties and underlying design issues, let's begin our journey into real Windows programming with our first Windows program.
+
+It's customary to write a "Hello World" program in any new language or OS that you're learning, so let's try that. Listing 2.1 is the standard DOS-based "Hello World."
+
+Listing 2.1 A DOS-Based "Hello World" Program
+// DEMO2_1.CPP - standard version
+#include <stdio.h>
+
+// main entry point for all standard DOS/console programs
+void main(void)
+{
+printf("\nTHERE CAN BE ONLY ONE!!!\n");
+} // end main
+
+Now let's see how it's done with Windows.
+
+TIP
+
+By the way, if you want to compile DEMO2_1.CPP, you can actually create what's called a CONSOLE APPLICATION with the VC++ or Borland compilers. These are like DOS applications, but 32-bit. They run only in text mode, but they're great for testing out ideas and algorithms. To do this make sure to set the target .EXE as CONSOLE APPLICATION in the compiler NOT Win32 .EXE!
+
+
+
+To compile the program, follow these steps:
+
+Create a new CONSOLE Application .EXE project and include DEMO2_1.CPP from T3DCHAP02\ on the CD-ROM.
+
+Compile and link the program.
+
+Run it! (Or run the precompiled version, DEMO2_1.EXE, on the CD-ROM.)
+
+It All Begins with WinMain()
+As I mentioned before, all Windows programs begin execution at the function named WinMain(). This is equivalent to main() in a straight DOS program. What you do in WinMain() is up to you. If you want, you can create a window, start processing events, and draw things on the screen. On the other hand, you can just make a call to one of the hundreds (or are there thousands?) of Win32 API functions. This is what we're going to do.
+
+I just want to print something on the screen in a little message box. There just so happens to be a Win32 API function that does this�MessageBox(). Listing 2.2 is a complete, compilable Windows program that creates and displays a message box that you can move around and close.
+
+Listing 2.2 Your First Windows Program
+// DEMO2_2.CPP - a simple message box
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>        // the main windows headers
+#include <windowsx.h>       // a lot of cool macros
+
+// main entry point for all windows programs
+int WINAPI WinMain(HINSTANCE hinstance,
+HINSTANCE hprevinstance,
+LPSTR lpcmdline,
+int ncmdshow)
+{
+// call message box api with NULL for parent window handle
+MessageBox(NULL, "THERE CAN BE ONLY ONE!!!",
+"MY FIRST WINDOWS PROGRAM",
+MB_OK | MB_ICONEXCLAMATION);
+// exit program
+return(0);
+}  // end WinMain
+
+To compile the program, follow these steps:
+
+Create a new Win32 .EXE project and include DEMO2_2.CPP from T3DCHAP02\ on the CD-ROM.
+
+Compile and link the program.
+
+Run it! (Or run the precompiled version, DEMO2_2.EXE, on the CD-ROM.)
+
+And you thought that a basic Windows program had hundreds of lines of code! Anyway, when you compile and run the program, you should see something like what's depicted in Figure 2.5.
+
+Figure 2.5. Running DEMO2_2.EXE
+
+
+Dissecting the Program
+Now that you have a complete Windows program, let's take it apart line by line and see what's going on. The very first line of code is
+
+#define WIN32_LEAN_AND_MEAN
+
+This deserves a bit of explanation. There are two ways to create Windows programs梬ith the Microsoft Foundation Classes (MFC), or with the Software Development Kit (SDK). MFC is much more complex, totally based on C++ and classes, and 10 times more powerful and complicated than you will ever need for games. On the other hand, the SDK is manageable, can be learned in a week or two (at least the rudiments of it), and uses straight C. Hence, the SDK is what I'm going to use in this book.
+
+So, WIN32_LEAN_AND_MEAN instructs the compiler (header file logic, actually) not to include extraneous MFC overhead. Now that we have that out of the way, let's move on.
+
+Next, the following header files are included:
+
+#include <windows.h>
+
+#include <windowsx.h>
+
+The first include of "windows.h" really includes all the Windows header files. There are a lot of them, so this is something like an inclusion macro to save you from manually including dozens of explicit header files.
+
+The second include, "windowsx.h", is a header that contains a number of important macros and constants that make Windows programming easier.
+
+And now, for the important part梩he main entry point of all Windows applications, WinMain():
+
+int WINAPI WinMain(HINSTANCE hinstance,
+HINSTANCE hprevinstance,
+LPSTR lpcmdline,
+int ncmdshow);
+
+First off, you should notice that weird WINAPI declarator. This is equivalent to the PASCAL function declarator, which forces the parameters to be passed from left to right, rather than the normal right-to-left order with the default CDECL. However, the PASCAL calling convention declarator is now obsolete, and WINAPI has taken its place. You must use WINAPI for the WinMain() function; otherwise, the startup code will end up passing the parameters incorrectly to the function!
+
+Examining Parameters
+Next, let's look at each of the parameters in detail:
+
+hinstance� This parameter is the instance handle that Windows generates for your application. Instances are pointers or numbers used to track resources. In this case, hinstance is used to track your application, like a name or address. When your application is executed, Windows will supply this parameter.
+
+hprevinstance� This parameter is no longer used, but in past versions of Windows, it tracked the previous instance of the application (in other words, the instance of the application that launched the current one). No wonder Microsoft got rid of it! It's like time travel梚t gives me a headache thinking about it.
+
+lpcmdline� This is a null-terminated string, similar to the command-line parameters of the standard C/C++ main(int argc, char **argv) function, except that there isn't a separate parameter analogous to argc indicating the number of command-line parameters. For example, if you create a Windows application called TEST.EXE and launch it with the following parameters:
+
+TEST.EXE one two three
+
+lpcmdline will contain the following data:
+
+lpcmdline = "one two three"
+
+Notice that the name of the .EXE itself is not part of the command line.
+
+ncmdshow� This final parameter is simply an integer that is passed to the application during launch, indicating how the main application window is to be opened. Thus, the user has a little control over how the application starts up. Of course, as the programmer, you can disregard this if you want, but it's there if you want to use it. (You pass it to ShowWindow(), but we're getting ahead of ourselves.) Table 2.2 lists the most common values that ncmdshow can take on.
+
+Table 2.2. Windows Codes for ncmdshow Value  Function  
+SW_SHOWNORMAL  Activates and displays a window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when displaying the window for the first time.  
+SW_SHOW  Activates the window and displays it in its current size and position.  
+SW_HIDE  Hides the window and activates another window.  
+SW_MAXIMIZE  Maximizes the specified window.  
+SW_MINIMIZE  Minimizes the specified window and activates the next top-level window in the Z order.  
+SW_RESTORE  Activates and displays the window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when restoring a minimized window.  
+SW_SHOWMAXIMIZED  Activates the window and displays it as a maximized window.  
+SW_SHOWMINIMIZED  Activates the window and displays it as a minimized window.  
+SW_SHOWMINNOACTIVE  Displays the window as a minimized window. The active window remains active.  
+SW_SHOWNA  Displays the window in its current state. The active window remains active.  
+SW_SHOWNOACTIVATE  Displays a window in its most recent size and position. The active window remains active.  
+
+
+As you can see from Table 2.2, there are a lot of settings for ncmdshow (many of which make no sense at this point). In reality, the majority of these settings will never be sent in ncmdshow. You will use them with another function, ShowWindow(), which actually displays a window once it's created. However, we will get to this a little later in the chapter.
+
+The point I want to make is that Windows has a lot of options, flags, and so on that you will never use, but they're still there. It's like VCR programming options梞ore is always better, as long as you don't need to use them if you don't want to. Windows is designed this way. It has to make everybody happy, so that means including a lot of options. In fact, we will use SW_SHOW, SW_SHOWNORMAL, and SW_HIDE 99 percent of the time, but you need to know the other for that one percent!
+
+Choosing a Message Box
+Finally, let's talk about the actual function call to MessageBox() within WinMain(). MessageBox() is a Win32 API function that does something useful for us, so we don't have to do it. It is used to display messages with various icons, along with a button or two. You see, simply displaying messages is so common in Windows applications that a function was written just to save application programmers the half hour or so it would take to write one every time.
+
+MessageBox() doesn't do much, but it does enough to get a window up on the screen, ask a question, and wait for the user's input. Here is the prototype for MessageBox():
+
+int MessageBox( HWND    hwnd,     // handle of owner window
+                LPCTSTR lptext,   // address of text in message box
+LPCTSTR lpcaption,// address of title of message box
+UINT    utype);   // style of message box
+
+The parameters are defined as follows:
+
+hwnd� This is the handle of the window you want the message box to be attached to. At this point I haven't covered window handles yet, so just think of it as the parent of the message box. In the case of DEMO2_2.CPP, we are setting it to NULL, so use the Windows desktop as the parent window.
+
+lptext� This is a null-terminated string containing the text you want to display.
+
+lpcaption� This is a null-terminated string containing the caption for the message dialog box.
+
+utype� This is about the only exciting parameter of the bunch. It controls what kind of message box is displayed.
+
+Take a look at Table 2.3 to see a (somewhat abridged) list of the various MessageBox() options.
+
+Table 2.3. MessageBox() Options Flag  Description  
+The following settings control the general style of the message box  
+MB_OK  The message box contains one pushbutton: OK. This is the default.  
+MB_OKCANCEL  The message box contains two pushbuttons: OK and Cancel.  
+MB_RETRYCANCEL  The message box contains two pushbuttons: Retry and Cancel.  
+MB_YESNO  The message box contains two pushbuttons: Yes and No.  
+MB_YESNOCANCEL  The message box contains three pushbuttons: Yes, No, and Cancel.  
+MB_ABORTRETRYIGNORE  The message box contains three pushbuttons: Abort, Retry, and Ignore.  
+This group controls the addition of an icon to add a little "poor man's multimedia"  
+MB_ICONEXCLAMATION  An exclamation-point icon appears in the message box.  
+MB_ICONINFORMATION  An icon consisting of a lowercase letter i in a circle appears in the message box.  
+MB_ICONQUESTION  A question-mark icon appears in the message box.  
+MB_ICONSTOP  A stop-sign icon appears in the message box.  
+This flag group controls which button is highlighted by default  
+MB_DEFBUTTONn  Where n is a number (1…4) indicating which button is the default, numbered from left to right.  
+Note: There are additional advanced OS level flags, but we aren't concerned with them. You can always look them up in the online compiler Win32 SDK Help if you want to know more.  
+
+
+You can logically OR the values together in Table 2.3 to create the desired message box. Usually, you will OR only one flag from each group.
+
+And of course, like all good Win32 API functions, MessageBox() returns a value to let you know what happened. In our case, who cares? But in general, you might want to know the return value if the message box was a yes/no question and so forth. Table 2.4 lists the possible return values.
+
+Table 2.4. Return Values for MessageBox() Value  Button Selected  
+IDABORT  Abort  
+IDCANCEL  Cancel  
+IDIGNORE  Ignore  
+IDNO  No  
+IDOK  OK  
+IDRETRY  Retry  
+IDYES  Yes  
+
+
+Finally, a table that can list all the values without defoliating an entire forest! Anyway, this completes the line-by-line analysis of our first Windows program梒lick!
+
+TIP
+
+Now I want you to get comfortable making changes to the program and compiling it in different ways. Try mucking with various compiler options, like optimization. Then try running the program through the debugger and see if you can figure that out. When you're done, come back.
+
+
+
+If you want to hear a sound, a cheap trick is to use the MessageBeep() function. You can look it up in the Win32 SDK. It's similar to the MessageBox() function as far as simplicity of use. Here it is:
+
+BOOL MessageBeep(UINT utype); // the sound to play
+
+The different sounds can be from among the constants shown in Table 2.5.
+
+Table 2.5. Sound Identifiers for MessageBeep() Value  Sound  
+MB_ICONASTERISK  System asterisk  
+MB_ICONEXCLAMATION  System exclamation  
+MB_ICONHAND  System hand  
+MB_ICONQUESTION  System question  
+MB_OK  System default  
+0xFFFFFFFF  Standard beep using the computer speaker梱uck!  
+Note: If you have an MS-Plus theme installed, you're sure to get some interesting results.  
+
+
+See how cool the Win32 API is? There are literally hundreds of functions to play with. Granted, they aren't the fastest things in the world, but for general housekeeping, I/O, and GUI stuff, they're grrrreat! (I felt like Tony the Tiger for a second <BG>.)
+
+Let's take a moment to summarize what we know at this point about Windows programming. The first thing is that Windows is multitasking/multithreaded, so multiple applications can run simultaneously. However, we don't have to do anything to make this happen. What does concern us is that Windows is event-driven. This means that we have to process events (which we have no idea how to do at this point) and respond to them. Okay, sounds good. And finally, all Windows programs start with the function WinMain(), which has a few more parameters than the normal DOS main() but is within the realm of logic and reason.
+
+With all that in mind, it's time to write a real Windows application. (But before we start, you might want to grab something to drink. Normally I would say Mountain Dew, but these days I'm a Red Bull man. Tastes like crap, but it keeps the synapses going and the can looks cool.)

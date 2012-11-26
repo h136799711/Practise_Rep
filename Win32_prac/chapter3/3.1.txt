@@ -1,0 +1,16 @@
+Chapter 3. Advanced Windows Programming
+"Are you sure this sweet machine isn't going to waste?"
+
+�Dade, Hackers
+
+It doesn't take a rocket scientist to realize that Windows programming is a huge subject. However, the cool thing about it is that you don't need to know much to get a lot done. With that in mind, this chapter supplies some of the most important pieces you need to make a complete Windows application. You'll learn about:
+
+Using resources such as icons, cursors, and sounds
+
+Menus
+
+Basic GDI and the video system
+
+Input devices
+
+Sending messages

@@ -1,0 +1,750 @@
+Before we both lose our minds with all this talk about Windows, DirectX, and 3D graphics, I would like to take a pause and show you a complete game梐lbeit a simple one, but a game nonetheless. This way you can see a real game loop and some graphics calls, and take a shot at compilation. Sound good? Alrighty, then!
+
+The problem is, we're only on Chapter 1. It's not like I can use stuff from later chapters…that would be cheating, right? So what I've decided to do is get you used to using black box APIs for game programming. Based on that requirement, I asked, "What are the absolute minimum requirements for creating a 2D Breakout-like game?" All we really need is the following functionality:
+
+Change into any graphics mode.
+
+Draw colored rectangles on the screen.
+
+Get the keyboard input.
+
+Synchronize the game loop using some timing functions.
+
+Draw a string of colored text on the screen.
+
+So I created a library called BLACKBOX.CPP|H. Within it is a DirectX (DirectDraw only) set of functions, along with support code that implements the required functionality. The beauty is, you don't need to look at the code; you just have to use the functions, based on their prototypes, and make sure to link with BLACKBOX.CPP|H to make an .EXE.
+
+Based on the BLACKBOX library, I wrote a game called FreakOut that demonstrates a number of the concepts that we have discussed in this chapter. FreakOut contains all the major components of a real game, including a game loop, scoring, levels, and even a little baby physics model for the ball. And I do mean baby! Figure 1.9 is a screenshot of the game in action. Granted, it's not Arkanoid, but it's not bad for four hours of work!
+
+Figure 1.9. A screenshot of FreakOut.
+
+Before I show you the source code to the game, I want you to take a look at how the project and its various components fit together. Refer to Figure 1.10.
+As you can see from the figure, the game is composed of the following files:
+
+
+FREAKOUT.CPP� The main game logic that uses BLACKBOX.CPP and creates a minimum Win32 application.
+
+
+
+BLACKBOX.CPP� The game library (don't peek).
+
+
+
+BLACKBOX.H� The header file for the game library.
+
+
+
+DDRAW.LIB� The DirectDraw import library needed to build the application. This doesn't contain the real DirectX code. It's more of an intermediary library that you make calls to, which in turn loads the dynamic link library DDRAW.DLL that does the real work. You can find this in the DirectX SDK installation under <LIB>.
+
+
+
+DDRAW.DLL� The runtime DirectDraw library that actually contains the COM implementation of the DirectDraw interface functions that are called through the DDRAW.LIB import library. You don't need to worry about this per se; you just need to make sure that the DirectX runtime files are installed.
+
+
+So, to compile, you need to include in your project the source files BLACKBOX.CPP and FREAKOUT.CPP, link to the library DDRAW.LIB, and make sure that BLACKBOX.H is in the search path or the working directory where you are compiling so that the compiler can find it.
+
+Now that we have that all straight, let's take a look at the BLACKBOX.H header file and see what the functions are within it.
+
+// BLACKBOX.H - Header file for demo game engine library
+
+// watch for multiple inclusions
+#ifndef BLACKBOX
+#define BLACKBOX
+
+// DEFINES ////////////////////////////////////////////////////
+
+// default screen size
+#define SCREEN_WIDTH    640  // size of screen
+#define SCREEN_HEIGHT   480
+#define SCREEN_BPP      8    // bits per pixel
+#define MAX_COLORS      256  // maximum colors
+
+// MACROS /////////////////////////////////////////////////////
+
+// these read the keyboard asynchronously
+#define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
+#define KEY_UP(vk_code)   ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
+
+// initializes a direct draw struct
+#define DD_INIT_STRUCT(ddstruct) {memset(&ddstruct,0,sizeof(ddstruct));
+ddstruct.dwSize=sizeof(ddstruct); }
+
+// TYPES //////////////////////////////////////////////////////
+
+// basic unsigned types
+typedef unsigned short USHORT;
+typedef unsigned short WORD;
+typedef unsigned char  UCHAR;
+typedef unsigned char  BYTE;
+
+// EXTERNALS //////////////////////////////////////////////////
+
+extern LPDIRECTDRAW7         lpdd;             // dd object
+extern LPDIRECTDRAWSURFACE7  lpddsprimary;     // dd primary surface
+extern LPDIRECTDRAWSURFACE7  lpddsback;        // dd back surface
+extern LPDIRECTDRAWPALETTE   lpddpal;          // a pointer dd palette
+extern LPDIRECTDRAWCLIPPER   lpddclipper;      // dd clipper
+extern PALETTEENTRY          palette[256];     // color palette
+extern PALETTEENTRY          save_palette[256]; // used to save palettes
+extern DDSURFACEDESC2        ddsd;    // a ddraw surface description struct
+extern DDBLTFX               ddbltfx;           // used to fill
+extern DDSCAPS2              ddscaps; // a ddraw surface capabilities struct
+extern HRESULT               ddrval;            // result back from dd calls
+extern DWORD                 start_clock_count; // used for timing
+// these defined the general clipping rectangle
+extern int min_clip_x,                             // clipping rectangle
+           max_clip_x,
+           min_clip_y,
+           max_clip_y;
+
+// these are overwritten globally by DD_Init()
+extern int screen_width,                            // width of screen
+           screen_height,                           // height of screen
+           screen_bpp;                              // bits per pixel
+
+// PROTOTYPES /////////////////////////////////////////////////
+
+// DirectDraw functions
+int DD_Init(int width, int height, int bpp);
+int DD_Shutdown(void);
+LPDIRECTDRAWCLIPPER DD_Attach_Clipper(LPDIRECTDRAWSURFACE7 lpdds,
+                                      int num_rects, LPRECT clip_list);
+int DD_Flip(void);
+int DD_Fill_Surface(LPDIRECTDRAWSURFACE7 lpdds,int color);
+
+// general utility functions
+DWORD Start_Clock(void);
+DWORD Get_Clock(void);
+DWORD Wait_Clock(DWORD count);
+
+// graphics functions
+int Draw_Rectangle(int x1, int y1, int x2, int y2,
+                   int color,LPDIRECTDRAWSURFACE7 lpdds=lpddsback);
+
+// gdi functions
+int Draw_Text_GDI(char *text, int x,int y,COLORREF color,
+                  LPDIRECTDRAWSURFACE7 lpdds=lpddsback);
+int Draw_Text_GDI(char *text, int x,int y,int color,
+                  LPDIRECTDRAWSURFACE7 lpdds=lpddsback);
+
+#endif
+
+Now, don't waste too much time straining your brain on the code and what all those weird global variables are. Rather, just look at the functions themselves. As you can see, there are functions to do everything that we needed for our little graphics interface. Based on that and a minimum Win32 application (the less Windows programming I have to do, the better), I have created the game FREAKOUT.CPP, which is shown in Listing 1.3. Take a good look at it, especially the main game loop and the calls to the game processing functions.
+
+Listing 1.3 The Source File FREAKOUT.CPP
+// INCLUDES ///////////////////////////////////////////////////
+
+#define WIN32_LEAN_AND_MEAN // include all macros
+#define INITGUID            // include all GUIDs
+
+#include <windows.h>        // include important windows stuff
+#include <windowsx.h>
+#include <mmsystem.h>
+
+#include <iostream.h>       // include important C/C++ stuff
+#include <conio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <math.h>
+#include <io.h>
+#include <fcntl.h>
+
+#include <ddraw.h>          // directX includes
+#include "blackbox.h"       // game library includes
+
+// DEFINES ////////////////////////////////////////////////////
+
+// defines for windows
+#define WINDOW_CLASS_NAME "WIN3DCLASS"  // class name
+
+#define WINDOW_WIDTH            640     // size of window
+#define WINDOW_HEIGHT           480
+
+// states for game loop
+#define GAME_STATE_INIT         0
+#define GAME_STATE_START_LEVEL  1
+#define GAME_STATE_RUN          2
+#define GAME_STATE_SHUTDOWN     3
+#define GAME_STATE_EXIT         4
+
+// block defines
+#define NUM_BLOCK_ROWS          6
+#define NUM_BLOCK_COLUMNS       8
+
+#define BLOCK_WIDTH             64
+#define BLOCK_HEIGHT            16
+#define BLOCK_ORIGIN_X          8
+#define BLOCK_ORIGIN_Y          8
+#define BLOCK_X_GAP             80
+#define BLOCK_Y_GAP             32
+
+// paddle defines
+#define PADDLE_START_X          (SCREEN_WIDTH/2 - 16)
+#define PADDLE_START_Y          (SCREEN_HEIGHT - 32);
+#define PADDLE_WIDTH            32
+#define PADDLE_HEIGHT           8
+#define PADDLE_COLOR            191
+
+// ball defines
+#define BALL_START_Y            (SCREEN_HEIGHT/2)
+#define BALL_SIZE                4
+
+// PROTOTYPES /////////////////////////////////////////////////
+
+// game console
+int Game_Init(void *parms=NULL);
+int Game_Shutdown(void *parms=NULL);
+int Game_Main(void *parms=NULL);
+
+// GLOBALS ////////////////////////////////////////////////////
+
+HWND main_window_handle  = NULL; // save the window handle
+HINSTANCE main_instance  = NULL; // save the instance
+int game_state           = GAME_STATE_INIT; // starting state
+
+int paddle_x = 0, paddle_y = 0; // tracks position of paddle
+int ball_x   = 0, ball_y   = 0; // tracks position of ball
+int ball_dx  = 0, ball_dy  = 0; // velocity of ball
+int score    = 0;               // the score
+int level    = 1;               // the current level
+int blocks_hit = 0;             // tracks number of blocks hit
+
+// this contains the game grid data
+
+UCHAR blocks[NUM_BLOCK_ROWS][NUM_BLOCK_COLUMNS];
+
+// FUNCTIONS //////////////////////////////////////////////////
+
+LRESULT CALLBACK WindowProc(HWND hwnd,
+                      UINT msg,
+                            WPARAM wparam,
+                            LPARAM lparam)
+{
+// this is the main message handler of the system
+PAINTSTRUCT    ps;           // used in WM_PAINT
+HDC            hdc;       // handle to a device context
+
+// what is the message
+switch(msg)
+    {
+    case WM_CREATE:
+        {
+    // do initialization stuff here
+    return(0);
+    }  break;
+
+    case WM_PAINT:
+         {
+         // start painting
+         hdc = BeginPaint(hwnd,&ps);
+
+         // the window is now validated
+
+         // end painting
+         EndPaint(hwnd,&ps);
+         return(0);
+        }  break;
+
+    case WM_DESTROY:
+         {
+           // kill the application
+         PostQuitMessage(0);
+         return(0);
+           }  break;
+
+    default:break;
+
+    }  // end switch
+
+// process any messages that we didn't take care of
+return (DefWindowProc(hwnd, msg, wparam, lparam));
+
+}  // end WinProc
+
+// WINMAIN ////////////////////////////////////////////////////
+
+int WINAPI WinMain(HINSTANCE hinstance,
+            HINSTANCE hprevinstance,
+            LPSTR lpcmdline,
+            int ncmdshow)
+{
+// this is the winmain function
+
+WNDCLASS winclass;  // this will hold the class we create
+HWND     hwnd;         // generic window handle
+MSG     msg;         // generic message
+HDC      hdc;       // generic dc
+PAINTSTRUCT ps;     // generic paintstruct
+// first fill in the window class structure
+winclass.style    = CS_DBLCLKS | CS_OWNDC |
+                 CS_HREDRAW | CS_VREDRAW;
+winclass.lpfnWndProc = WindowProc;
+winclass.cbClsExtra        = 0;
+winclass.cbWndExtra        = 0;
+winclass.hInstance        = hinstance;
+winclass.hIcon            = LoadIcon(NULL, IDI_APPLICATION);
+winclass.hCursor        = LoadCursor(NULL, IDC_ARROW);
+winclass.hbrBackground    = (HBRUSH)GetStockObject(BLACK_BRUSH);
+winclass.lpszMenuName    = NULL;
+winclass.lpszClassName    = WINDOW_CLASS_NAME;
+
+// register the window class
+if (!RegisterClass(&winclass))
+    return(0);
+
+// create the window, note the use of WS_POPUP
+if (!(hwnd = CreateWindow(WINDOW_CLASS_NAME,    // class
+        "WIN3D Game Console",    // title
+        WS_POPUP | WS_VISIBLE,
+        0,0,                    // initial x,y
+        GetSystemMetrics(SM_CXSCREEN),  // initial width
+        GetSystemMetrics(SM_CYSCREEN),  // initial height
+        NULL,        // handle to parent
+        NULL,        // handle to menu
+        hinstance,   // instance
+        NULL)))      // creation parms
+return(0);
+
+// hide mouse
+ShowCursor(FALSE);
+
+// save the window handle and instance in a global
+main_window_handle = hwnd;
+main_instance      = hinstance;
+
+// perform all game console specific initialization
+Game_Init();
+
+// enter main event loop
+while(1)
+    {
+    if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+    {
+    // test if this is a quit
+        if (msg.message == WM_QUIT)
+           break;
+
+    // translate any accelerator keys
+    TranslateMessage(&msg);
+
+    // send the message to the window proc
+    DispatchMessage(&msg);
+    } // end if
+       // main game processing goes here
+       Game_Main();
+
+    }  // end while
+
+// shutdown game and release all resources
+Game_Shutdown();
+
+// show mouse
+ShowCursor(TRUE);
+
+// return to Windows like this
+return(msg.wParam);
+
+}  // end WinMain
+
+// T3DX GAME PROGRAMMING CONSOLE FUNCTIONS ////////////////////
+
+int Game_Init(void *parms)
+{
+// this function is where you do all the initialization
+// for your game
+
+// return success
+return(1);
+
+}  // end Game_Init
+
+///////////////////////////////////////////////////////////////
+
+int Game_Shutdown(void *parms)
+{
+// this function is where you shutdown your game and
+// release all resources that you allocated
+
+// return success
+return(1);
+
+}  // end Game_Shutdown
+
+///////////////////////////////////////////////////////////////
+
+void Init_Blocks(void)
+{
+// initialize the block field
+for (int row=0; row < NUM_BLOCK_ROWS; row++)
+    for (int col=0; col < NUM_BLOCK_COLUMNS; col++)
+         blocks[row][col] = row*16+col*3+16;
+
+}  // end Init_Blocks
+///////////////////////////////////////////////////////////////
+
+void Draw_Blocks(void)
+{
+// this function draws all the blocks in row major form
+int x1 = BLOCK_ORIGIN_X, // used to track current position
+    y1 = BLOCK_ORIGIN_Y;
+
+// draw all the blocks
+for (int row=0; row < NUM_BLOCK_ROWS; row++)
+    {
+    // reset column position
+    x1 = BLOCK_ORIGIN_X;
+
+    // draw this row of blocks
+    for (int col=0; col < NUM_BLOCK_COLUMNS; col++)
+        {
+        // draw next block (if there is one)
+        if (blocks[row][col]!=0)
+            {
+            // draw block
+            Draw_Rectangle(x1-4,y1+4,
+                 x1+BLOCK_WIDTH-4,y1+BLOCK_HEIGHT+4,0);
+
+            Draw_Rectangle(x1,y1,x1+BLOCK_WIDTH,
+                 y1+BLOCK_HEIGHT,blocks[row][col]);
+            }  // end if
+
+        // advance column position
+        x1+=BLOCK_X_GAP;
+        }  // end for col
+
+    // advance to next row position
+    y1+=BLOCK_Y_GAP;
+
+    }  // end for row
+
+}  // end Draw_Blocks
+
+///////////////////////////////////////////////////////////////
+
+void Process_Ball(void)
+{
+// this function tests if the ball has hit a block or the paddle
+// if so, the ball is bounced and the block is removed from
+// the playfield note: very cheesy collision algorithm :)
+
+// first test for ball block collisions
+
+// the algorithm basically tests the ball against each
+// block's bounding box this is inefficient, but easy to
+// implement, later we'll see a better way
+
+int x1 = BLOCK_ORIGIN_X, // current rendering position
+    y1 = BLOCK_ORIGIN_Y;
+
+int ball_cx = ball_x+(BALL_SIZE/2),  // computer center of ball
+    ball_cy = ball_y+(BALL_SIZE/2);
+
+// test of the ball has hit the paddle
+if (ball_y > (SCREEN_HEIGHT/2) && ball_dy > 0)
+   {
+   // extract leading edge of ball
+   int x = ball_x+(BALL_SIZE/2);
+   int y = ball_y+(BALL_SIZE/2);
+
+   // test for collision with paddle
+   if ((x >= paddle_x && x <= paddle_x+PADDLE_WIDTH) &&
+       (y >= paddle_y && y <= paddle_y+PADDLE_HEIGHT))
+       {
+       // reflect ball
+       ball_dy=-ball_dy;
+
+       // push ball out of paddle since it made contact
+       ball_y+=ball_dy;
+
+       // add a little english to ball based on motion of paddle
+       if (KEY_DOWN(VK_RIGHT))
+          ball_dx-=(rand()%3);
+       else
+       if (KEY_DOWN(VK_LEFT))
+          ball_dx+=(rand()%3);
+       else
+          ball_dx+=(-1+rand()%3);
+
+       // test if there are no blocks, if so send a message
+       // to game loop to start another level
+       if (blocks_hit >= (NUM_BLOCK_ROWS*NUM_BLOCK_COLUMNS))
+          {
+          game_state = GAME_STATE_START_LEVEL;
+          level++;
+          }  // end if
+
+       // make a little noise
+       MessageBeep(MB_OK);
+
+       // return
+       return;
+
+       }  // end if
+
+   }  // end if
+// now scan thru all the blocks and see if ball hit blocks
+for (int row=0; row < NUM_BLOCK_ROWS; row++)
+    {
+    // reset column position
+    x1 = BLOCK_ORIGIN_X;
+
+    // scan this row of blocks
+    for (int col=0; col < NUM_BLOCK_COLUMNS; col++)
+        {
+        // if there is a block here then test it against ball
+        if (blocks[row][col]!=0)
+           {
+           // test ball against bounding box of block
+           if ((ball_cx > x1) && (ball_cx < x1+BLOCK_WIDTH) &&
+               (ball_cy > y1) && (ball_cy < y1+BLOCK_HEIGHT))
+               {
+               // remove the block
+               blocks[row][col] = 0;
+
+               // increment global block counter, so we know
+               // when to start another level up
+               blocks_hit++;
+
+               // bounce the ball
+               ball_dy=-ball_dy;
+
+               // add a little english
+               ball_dx+=(-1+rand()%3);
+
+               // make a little noise
+               MessageBeep(MB_OK);
+
+               // add some points
+               score+=5*(level+(abs(ball_dx)));
+
+               // that's it -- no more block
+               return;
+
+               }  // end if
+
+           }  // end if
+
+        // advance column position
+        x1+=BLOCK_X_GAP;
+        }  // end for col
+
+    // advance to next row position
+    y1+=BLOCK_Y_GAP;
+
+    }  // end for row
+}  // end Process_Ball
+
+///////////////////////////////////////////////////////////////
+
+int Game_Main(void *parms)
+{
+// this is the workhorse of your game it will be called
+// continuously in real-time this is like main() in C
+// all the calls for your game go here!
+
+char buffer[80]; // used to print text
+
+// what state is the game in?
+if (game_state == GAME_STATE_INIT)
+    {
+    // initialize everything here graphics
+    DD_Init(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP);
+
+    // seed the random number generator
+    // so game is different each play
+    srand(Start_Clock());
+
+    // set the paddle position here to the middle bottom
+    paddle_x = PADDLE_START_X;
+    paddle_y = PADDLE_START_Y;
+
+    // set ball position and velocity
+    ball_x = 8+rand()%(SCREEN_WIDTH-16);
+    ball_y = BALL_START_Y;
+    ball_dx = -4 + rand()%(8+1);
+    ball_dy = 6 + rand()%2;
+
+    // transition to start level state
+    game_state = GAME_STATE_START_LEVEL;
+
+    }  // end if
+////////////////////////////////////////////////////////////////
+else
+if (game_state == GAME_STATE_START_LEVEL)
+    {
+    // get a new level ready to run
+
+    // initialize the blocks
+    Init_Blocks();
+
+    // reset block counter
+    blocks_hit = 0;
+
+    // transition to run state
+    game_state = GAME_STATE_RUN;
+    }  // end if
+///////////////////////////////////////////////////////////////
+else
+if (game_state == GAME_STATE_RUN)
+    {
+    // start the timing clock
+    Start_Clock();
+
+    // clear drawing surface for the next frame of animation
+    Draw_Rectangle(0,0,SCREEN_WIDTH-1, SCREEN_HEIGHT-1,200);
+
+    // move the paddle
+    if (KEY_DOWN(VK_RIGHT))
+       {
+       // move paddle to right
+       paddle_x+=8;
+
+       // make sure paddle doesn't go off screen
+       if (paddle_x > (SCREEN_WIDTH-PADDLE_WIDTH))
+          paddle_x = SCREEN_WIDTH-PADDLE_WIDTH;
+
+       }  // end if
+    else
+    if (KEY_DOWN(VK_LEFT))
+       {
+       // move paddle to right
+       paddle_x-=8;
+
+       // make sure paddle doesn't go off screen
+       if (paddle_x < 0)
+          paddle_x = 0;
+
+       }  // end if
+
+    // draw blocks
+    Draw_Blocks();
+
+    // move the ball
+    ball_x+=ball_dx;
+    ball_y+=ball_dy;
+
+    // keep ball on screen, if the ball hits the edge of
+    // screen then bounce it by reflecting its velocity
+    if (ball_x > (SCREEN_WIDTH - BALL_SIZE) || ball_x < 0)
+       {
+       // reflect x-axis velocity
+       ball_dx=-ball_dx;
+
+       // update position
+       ball_x+=ball_dx;
+       }  // end if
+    // now y-axis
+    if (ball_y < 0)
+       {
+       // reflect y-axis velocity
+       ball_dy=-ball_dy;
+
+       // update position
+       ball_y+=ball_dy;
+       }  // end if
+   else
+   // penalize player for missing the ball
+   if (ball_y > (SCREEN_HEIGHT - BALL_SIZE))
+       {
+       // reflect y-axis velocity
+       ball_dy=-ball_dy;
+
+       // update position
+       ball_y+=ball_dy;
+
+       // minus the score
+       score-=100;
+
+       }  // end if
+
+    // next watch out for ball velocity getting out of hand
+    if (ball_dx > 8) ball_dx = 8;
+    else
+    if (ball_dx < -8) ball_dx = -8;
+
+    // test if ball hit any blocks or the paddle
+    Process_Ball();
+
+    // draw the paddle and shadow
+    Draw_Rectangle(paddle_x-8, paddle_y+8,
+                   paddle_x+PADDLE_WIDTH-8,
+                   paddle_y+PADDLE_HEIGHT+8,0);
+
+    Draw_Rectangle(paddle_x, paddle_y,
+                   paddle_x+PADDLE_WIDTH,
+                   paddle_y+PADDLE_HEIGHT,PADDLE_COLOR);
+
+    // draw the ball
+    Draw_Rectangle(ball_x-4, ball_y+4, ball_x+BALL_SIZE-4,
+                   ball_y+BALL_SIZE+4, 0);
+    Draw_Rectangle(ball_x, ball_y, ball_x+BALL_SIZE,
+                   ball_y+BALL_SIZE, 255);
+
+    // draw the info
+    sprintf(buffer,"F R E A K O U T           Score %d   //
+          Level %d",score,level);
+    Draw_Text_GDI(buffer, 8,SCREEN_HEIGHT-16, 127);
+    // flip the surfaces
+    DD_Flip();
+
+    // sync to 33ish fps
+    Wait_Clock(30);
+
+    // check if user is trying to exit
+    if (KEY_DOWN(VK_ESCAPE))
+       {
+       // send message to windows to exit
+       PostMessage(main_window_handle, WM_DESTROY,0,0);
+
+       // set exit state
+       game_state = GAME_STATE_SHUTDOWN;
+
+       }  // end if
+
+    }  // end if
+///////////////////////////////////////////////////////////////
+else
+if (game_state == GAME_STATE_SHUTDOWN)
+   {
+   // in this state shut everything down and release resources
+   DD_Shutdown();
+
+   // switch to exit state
+   game_state = GAME_STATE_EXIT;
+
+   }  // end if
+
+// return success
+return(1);
+
+}  // end Game_Main
+
+Cool, huh? That's the entire Win32/DirectX game. Well, almost. There are a few hundred lines of code in the BLACKBOX.CPP source file, but we'll just pretend that it's like DirectX and someone else wrote it (me!). Anyway, let's take a quick look at the contents of Listing 1.3.
+
+Basically, Windows needs to have what's called an event loop. This is standard for all Windows programs since Windows is, for the most part, event-driven. However, games aren't event-driven; they run at all times, whether the user does something or not. So we need to at least support a minimum event loop to make Windows happy. The code that implements this is in WinMain()梛eez, that's a surprise, huh? WinMain() is the main entry point for all Windows programs, just like main() is the entry point for all DOS/Unix programs (please wash your mouth out if you said "Unix" out loud). In any case, the WinMain() for FreakOut creates a window and then enters right into the event loop. If Windows needs to do something, it does so. When all the basic event handling is over, Game_Main() is called. This is where the real action occurs for our game.
+
+If you wanted to, you could loop in Game_Main() forever, never releasing it back to the main event loop in WinMain(). But this would be bad because Windows would never receive any messages and you would starve the system. Alas, what we need to do is perform one frame of animation and logic and then return back to WinMain(). This way, Windows will continue to function and process messages. If this all sounds a little hocus-pocus, don't worry梚t gets worse in the next chapter <BG>.
+
+Once in Game_Main(), the logic for FreakOut is executed. The game image is rendered into an offscreen workspace and then finally shown on the display at the end of the loop via the DD_FLIP() call. So what I want you to do is take a look at all the game states and try to follow each section of the game loop and what it does. To play the game, simply click on FREAKOUT.EXE. The program will launch immediately. The controls are
+
+
+Right arrow Move paddle right.
+
+
+
+Left arrow Move paddle left.
+
+
+
+Esc Exit back to Windows.
+Q
+
+Also, there's a 100-point penalty if you miss the ball, so watch it!
+
+When you feel comfortable with the game code and gameplay, try modifying the game and making changes to it. You could add different background colors (0�255 are valid colors), more balls, a paddle that changes size, and more sound effects (which I'm making right now with the Win32 API MessageBeep() function).
+
+

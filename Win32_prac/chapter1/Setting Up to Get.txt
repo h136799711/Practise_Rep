@@ -1,0 +1,42 @@
+Setting Up to Get Down Using the Compiler
+One of the most frustrating parts of learning Windows game programming is learning how to use the compiler. In most cases, you're so excited to get started that you dive into the IDE and try to compile, and a million compiler and linker errors pop up! To help with this problem, let's cover a few basic compiler concepts here.
+
+0.Read the entire compiler instructions release, please, I beg you!
+
+1.You must install the DirectX SDK on your system. All you need to do is navigate to the DirectX SDK directory on the CD, read README.TXT, and do what it says (which should be nothing more than Click on the DirectX SDK INSTALL.EXE program).
+
+2.We are going to make Win32 .EXE programs, not .DLLs, ActiveX components, and so on. So if you want to compile, the first thing you need to do with your compiler is create a new project or workspace and set the target output file to Win32 .EXE. This step is shown for the VC++ 6.0 compiler in Figure 1.6.
+
+Figure 1.6. Creating a Win32 .EXE with Visual C++ 6.0.
+3.Add the source files to the project using the Add Files command from the main menu or from the project node itself. This is shown for the VC++ 6.0 compiler in Figure 1.7.
+
+4.When you get to the DirectX chapters, and from there on, you'll have to include most of the DirectX COM interface libraries listed here and shown in Figure 1.8.
+
+Figure 1.8. The resources needed to create a Win32 DirectX application.
+
+DDRAW.LIB
+
+DSOUND.LIB
+
+DINPUT.LIB
+
+DINPUT8.LIB
+
+DSETUP.LIB*
+
+
+NOTE
+
+You will not need DSETUP.LIB unless you're using DirectSetup.
+
+These DirectX .LIB files are located in the <LIB> directory wherever you installed the DirectX SDK. You must add these .LIB files to your project or workspace. You can't just add the search path, because the search engine will probably find old DirectX 3.0 .LIB files along with installation libraries of the compiler itself. While you're at it, you may have to add the Windows Multimedia Extensions library, WINMM.LIB, to your project. This file is located in the <LIB> directory of your compiler installation.
+
+You're ready to compile your program.
+
+WARNING
+
+If you're a Borland user, there is a separate Borland library directory within the DirectX SDK. So make sure to add those .LIB files�not the MS-compatible files higher up in the directory tree.
+
+
+
+If you still have questions about this process, don't worry. I'll revisit these steps a number of times throughout the book when discussing Windows programming and your first contact with DirectX.

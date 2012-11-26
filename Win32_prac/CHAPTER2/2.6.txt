@@ -1,0 +1,218 @@
+The Windows Class windows类
+Windows is really an object-oriented OS, so a lot of concepts and procedures in Windows have their roots in C++. One of these concepts is Windows classes. Each window, control, list box, dialog box, gadget, and so forth in Windows is actually a window. What makes them all different is the class that defines them. A Windows class is a description of a window type that Windows can handle.
+windows是一个真正的基于对象的操作系统，因此有很多概念和windows中的处理在
+
+There are a number of predefined Window classes, such as buttons, list boxes, file selectors, and so on. However, you're free to create your own Windows classes. In fact, you will create at least one Windows class for each application you write. Otherwise, your program would be rather boring. So you can think of a Windows class as a template for Windows to follow when drawing your window, as well as processing messages for it.
+
+Two data structures are available to hold Windows class information: WNDCLASS and WNDCLASSEX. WNDCLASS is the older of the two and will probably be obsolete soon, so we will use the new "extended" version, WNDCLASSEX. The structures are very similar, and if you are interested, you can look up the old WNDCLASS in the Win32 Help. Anyway, let's take a look at WNDCLASSEX as defined in the Windows header files:
+
+typedef struct _WNDCLASSEX
+        {
+        UINT    cbSize;        // size of this structure
+        UINT    style;         // style flags
+        WNDPROC lpfnWndProc;   // function pointer to handler
+        int     cbClsExtra;    // extra class info
+        int     cbWndExtra;    // extra window info
+        HANDLE  hInstance;     // the instance of the application
+        HICON   hIcon;         // the main icon
+        HCURSOR hCursor;       // the cursor for the window
+HBRUSH  hbrBackground; // the background brush to paint the window
+LPCTSTR lpszMenuName;  // the name of the menu to attach
+LPCTSTR lpszClassName; // the name of the class itself
+HICON   hIconSm;       // the handle of the small icon
+}  WNDCLASSEX;
+
+So what you would do is create one of these structures and then fill in all the fields:
+
+WNDCLASSEX winclass; // a blank windows class
+
+The first field, cbSize, is very important (even Petzold forgot this in Programming Windows 95). It is the size of the WNDCLASSEX structure itself. You might be wondering why the structure needs to know how big it is. That's a good question. The reason is that if this structure is passed as a pointer, the receiver can always check the first field to decide how long the data chunk is at the very least. It's like a precaution and a little helper info so other functions don't have to compute the class size during runtime. Therefore, all you have to do is set it like this:
+
+winclass.cbSize = sizeof(WNDCLASSEX);
+
+The next field contains the style information flags that describe the general properties of the window. There are a lot of these flags, so I'm not going to show them all. Suffice it to say that you can create any type of window with them. Table 2.6 shows a good working subset of the possible flags. You can logically OR these values together to derive the type of window you want.
+
+Table 2.6. Style Flags for Window Classes Flag  Description  
+CS_HREDRAW  Redraws the entire window if a movement or size adjustment changes the width of the window.  
+CS_VREDRAW  Redraws the entire window if a movement or size adjustment changes the height of the window.  
+CS_OWNDC  Allocates a unique device context for each window in the class (more on this later in the chapter).  
+CS_DBLCLKS  Sends a double-click message to the window procedure when the user double-clicks the mouse while the cursor is in a window belonging to the class.  
+CS_PARENTDC  Sets the clipping region of the child window to that of the parent window so that the child can draw on the parent.  
+CS_SAVEBITS  Saves the client image in a window so you don't have to redraw it every time the window is obscured, moved, etc. However, this takes up more memory and is slower that doing it yourself.  
+CS_NOCLOSE  Disables the Close command on the system menu.  
+Note: The most commonly used flags are highlighted. 
+
+
+Table 2.6 contains a lot of flags, and I can't blame you if you're confused. For now, though, just set the style flags to indicate that you want the window to be redrawn if it is moved or resized, and you want a static device context along with the ability to handle double-click events.
+
+I'm going to talk about device contexts in detail in Chapter 3, "Advanced Windows Programming," but basically they are used as data structures for graphics rendering into a window. Hence, if you want to do graphics, you need to request a device context for the particular window you are interested in. Alas, if you set the Windows class so that it has its own device context via CS_OWNDC, you can save some time since you don't have to request one each time you want to do graphics. Did that help at all, or did I make it worse? Windows is like that�the more you know, the more you don't. Anyway, here's how to set the style field:
+
+winclass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC | CS_DBLCLICKS;
+
+The next field of the WNDCLASSEX structure, lpfnWndProc, is a function pointer to the event handler. Basically, what you are setting here is a callback function for the class. Callback functions are fairly common in Windows programming and work like this: When something happens, instead of you randomly polling for it, Windows notifies you by calling a callback function you've supplied. Then, within the callback function, you take whatever action needs to be taken.
+
+This process is how the basic Window event loop and event handler work. You supply a callback function to the Windows class (with a specific prototype, of course). When an event occurs, Windows calls it for you, as Figure 2.6 shows. Again, we will cover this more in later sections. But for now, just set it to the event function that you'll write in a moment:
+
+winclass.lpfnWndProc = WinProc; // this is our function
+
+Figure 2.6. The Windows event handler callback in action.
+
+
+TIP
+
+If you're not familiar with function pointers, they are like virtual functions in C++. If you're not familiar with virtual functions, I guess I have to explain them <BG>. Let's say you have two functions that operate on two numbers:
+
+int Add(int op1, int op2) {return(op1+op2);}
+int Sub(int op1, int op2) {return(op1-op2);}
+
+You want to be able to call either function with the same call. You can do so with a function pointer, like this:
+
+// define a function pointer that takes two int and
+returns an int
+int (Math*)(int, int);
+
+Then you can assign the function pointer like this:
+
+Math = Add;
+int result = Math(1,2); // this really calls Add(1,2)
+// result will be 3
+
+Math = Sub;
+int result = Math(1,2); // this really calls Sub(1,2)
+// result will be �1
+
+Cool, huh?
+
+
+
+The next two fields, cbClsExtra and cbWndExtra, were originally designed to instruct Windows to save some extra space in the Windows class to hold extra runtime information. However, most people don't use these fields and simply set them to 0, like this:
+
+winclass.cbClsExtra = 0; // extra class info space
+winclass.cbWndExtra = 0; // extra window info space
+
+Moving on, next is the hInstance field. This is simply the hinstance that is passed to the WinMain() function on startup, so just copy it in from WinMain():
+
+winclass.hInstance = hinstance; // assign the application instance
+
+The remaining fields relate to graphical aspects of the Windows class, but before I discuss them, I want to take a quick moment to review handles.
+
+Again and again you're going to see handles in Windows programs and types: handles to bitmaps, handles to cursors, handles to everything. Remember, handles are just identifiers based on an internal Windows type. In fact, they are really integers. But Microsoft might change this, so it's a good idea to be safe and use the Microsoft types. In any case, you're going to see more and more "handles to [fill in the blank]," so don't trip out on me! And remember, any type prefixed by h is usually a handle. Okay, back to the chalkboard.
+
+The next field sets the type of icon that will represent your application. You have the power to load your own custom icon, but for now you're going to use a system icon, which�you guessed it�you need a handle for. To retrieve a handle to a common system icon, you can use the LoadIcon() function, like this:
+
+winclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+
+This code loads the standard application icon�boring, but simple. If you're interested in the LoadIcon() function, take a look at its prototype below, and see Table 2.7 for various icon options:
+
+HICON LoadIcon(HINSTANCE hInstance,  // handle of application instance
+LPCTSTR lpIconName);  // icon-name string or icon resource identifier
+
+Here, hInstance is the instance of the application to load the icon resource from (more on this later), but for now just set it to NULL to load one of the standard icons. And lpIconName is a null-terminated string containing the name of the icon resource to be loaded. However, when hInstance is NULL, lpIconName can be one of the values in Table 2.7.
+
+Table 2.7. Icon Identifiers for LoadIcon() Value  Description  
+IDI_APPLICATION  Default application icon  
+IDI_ASTERISK  Asterisk  
+IDI_EXCLAMATION  Exclamation point  
+IDI_HAND  Hand-shaped icon  
+IDI_QUESTION  Question mark  
+IDI_WINLOGO  Windows logo  
+
+
+All right, we're about halfway through all the fields. Take another breath, and let's forge on to the next field: hCursor. This is similar to hIcon in that it's a handle to a graphics object. However, hCursor differs in that it's the handle to the cursor that will be displayed when the pointer enters the client region of the window. LoadCursor() is used to obtain a handle to a cursor that's a resource or a predefined system cursor. We will cover resources a bit later, but they are simply pieces of data, like bitmaps, cursors, icons, sounds, etc., that are compiled into your application and can be accessed at runtime. Anyway, here's how to set the cursor for the Windows class:
+
+winclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+
+And here is the prototype for LoadCursor() (along with Table 2.8, which contains the various system cursor identifiers):
+
+HCURSOR LoadCursor(HINSTANCE hInstance,// handle of application instance
+LPCTSTR lpCursorName); // name string or cursor resource identifier
+
+Again, hInstance is the application instance of your .EXE that contains the resource data to extract a custom cursor by name with. However, you aren't using this functionality yet and will set hInstance to NULL to allow default system cursors only.
+
+lpCursorName identifies the resource name string or handle to the resource (which we aren't using at this point), or is a constant that identifies one of the system defaults shown in Table 2.8.
+
+Table 2.8. Values for LoadCursor() Value  Description  
+IDC_ARROW  Standard arrow  
+IDC_APPSTARTING  Standard arrow and small hourglass  
+IDC_CROSS  Crosshair  
+IDC_IBEAM  Text I-beam  
+IDC_NO  Slashed circle  
+IDC_SIZEALL  Four-pointed arrow  
+IDC_SIZENESW  Double-pointed arrow pointing northeast and southwest  
+IDC_SIZENS  Double-pointed arrow pointing north and south  
+IDC_SIZENWSE  Double-pointed arrow pointing northwest and southeast  
+IDC_SIZEWE  Double-pointed arrow pointing west and east  
+IDC_UPARROW  Vertical arrow  
+IDC_WAIT  Hourglass  
+
+
+Now we're cooking! We're almost done�the remaining fields are a little more interesting. Let's move on to hbrBackground.
+
+Whenever a window is drawn or refreshed, at the very least, Windows will repaint the background of the window's client area for you with a predefined color, or brush in Windows-speak. Hence, hbrBackground is a handle to the brush that you want the window to be refreshed with. Brushes, pens, colors, and graphics are all part of GDI�the Graphics Device Interface�and we will discuss them in detail in the next chapter. For now, I'm going to show you how to request a basic system brush to paint the window with. This is accomplished with the GetStockObject() function, as shown in the following line of code (notice the cast to (HBRUSH) ):
+
+winclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+
+GetStockObject() is a general function that retrieves a handle to one of the Windows stock brushes, pens, palettes, or fonts. GetStockObject() takes a single parameter indicating which one of these resources to load. Table 2.9 contains a list of possible stock objects for brushes and pens only.
+
+Table 2.9. Stock Object Identifiers for GetStockObject() Value  Description  
+BLACK_BRUSH  Black brush  
+WHITE_BRUSH  White brush  
+GRAY_BRUSH  Gray brush  
+LTGRAY_BRUSH  Light gray brush  
+DKGRAY_BRUSH  Dark gray brush  
+HOLLOW_BRUSH  Hollow brush  
+NULL_BRUSH  Null brush  
+BLACK_PEN  Black pen  
+WHITE_PEN  White pen  
+NULL_PEN  Null pen  
+
+
+The next field in the WNDCLASS structure is the lpszMenuName. This is a null-terminated ASCII string of the menu resource's name to load and attach to the window. We will see how this works later in Chapter 3, "Advanced Windows Programming." For now, we'll just set it to NULL:
+
+winclass.lpszMenuName = NULL;  // the name of the menu to attach
+
+As I mentioned a while ago, each Windows class represents a different type of window that your application can create. Classes are like templates, in a manner of speaking, but Windows needs some way to track and identify them. Therefore, the next field, lpszClassName, is for just that. This field is filled with a null-terminated string that contains a text identifier for your class. I personally like using identifiers like "WINCLASS1", "WINCLASS2", and so forth. It's up to you, but it's better to keep it simple, like this:
+
+winclass.lpszClassName = "WINCLASS1"; // the name of the class itself
+
+After this assignment, you will refer to the new Windows class by its class name, "WINCLASS1"�kinda cool, huh?
+
+Last but not least is the small application icon. This is a new addition to the Windows class WNDCLASSEX structure and wasn't available in the older WNDCLASS. Basically, this handle points to the icon you want to display on your window's title bar and on the Windows desktop taskbar. Usually you would load a custom resource, but for now let's just use one of the standard Windows icons via LoadIcon():
+
+winclass.hIconSm =
+LoadIcon(NULL, IDI_APPLICATION); // the handle of the small icon
+
+That's it. Now let's take a look at the whole class definition at once:
+
+WNDCLASSEX winclass; // this will hold the class we create
+// first fill in the window class structure
+winclass.cbSize = sizeof(WNDCLASSEX);
+winclass.style     = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+winclass.lpfnWndProc = WindowProc;
+winclass.cbClsExtra  = 0;
+winclass.cbWndExtra  = 0;
+winclass.hInstance   = hinstance;
+winclass.hIcon       = LoadIcon(NULL, IDI_APPLICATION);
+winclass.hCursor     = LoadCursor(NULL, IDC_ARROW);
+winclass.hbrBackground    = GetStockObject(BLACK_BRUSH);
+winclass.lpszMenuName    = NULL;
+winclass.lpszClassName    = "WINCLASS1";
+winclass.hIconSm      = LoadIcon(NULL, IDI_APPLICATION);
+
+And of course, if you want to save some typing, you could initialize the structure on-the-fly like this:
+
+WNDCLASSEX winclass = {
+winclass.cbSize = sizeof(WNDCLASSEX),
+CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
+WindowProc,
+0,
+0,
+hinstance,
+LoadIcon(NULL, IDI_APPLICATION),
+LoadCursor(NULL, IDC_ARROW),
+GetStockObject(BLACK_BRUSH),
+NULL,
+"WINCLASS1",
+LoadIcon(NULL, IDI_APPLICATION)} ;
+
+It saves typing!

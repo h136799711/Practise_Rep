@@ -1,0 +1,54 @@
+The Genesis of Windows
+To put you in the mood for the onslaught of horror that I'm about to unleash upon your mind (especially you DOS diehards), let's take a quick look at how Windows has shaped up over the past years and its relationship to the game development world梥hall we?
+
+Early Windows Versions
+It all began with the release of Windows 1.0. This was Microsoft's first attempt at a commercial windowed operating system, and it was pretty much a failure. Windows 1.0 was based completely on DOS (big mistake), wasn't multitasking, ran really slow, and looked really bad. Its looks were probably the most important reason for its failure <BG>. Sarcasm aside, the problem was that Windows 1.0 needed much more hardware, graphics, and sound capabilities than the 80286 (or worst yet, 8086) machines of the time had to offer.
+
+Nevertheless, Microsoft forged ahead, and shortly thereafter it released Windows 2.0. I actually remember working at Software Publishing Corporation when we got the beta of Windows 2.0. There was a boardroom filled with executives and the president of the company (as usual, he had a cocktail in his hand). We ran the Windows 2.0 beta demo and loaded multiple applications, and it seemed to work. However, at this time IBM Presentation Manager (PM) was out. PM simply looked a lot better, and it was based on OS/2, a vastly more advanced OS than Windows 2.0 (which was still a window manager simply overlaid on top of DOS). The verdict of the board that day: "Not bad, but not a viable OS for development. Let's stick to DOS, and can I have another cocktail?"
+
+Windows 3.x
+In 1990, the planets must have been in alignment, because Windows 3.0 was released and it was pretty damn good! It wasn't up to par with Mac OS yet, but who cared? (Real programmers hate Macs.) Finally, software developers could create sexy applications on the PC and start migrating away from DOS for business applications. This was the turning point for the PC and the thing that eventually put the Mac out of the running for business applications and later for desktop publishing. (That, along with Apple releasing new hardware every five minutes.)
+
+Although Windows 3.0 worked well, it had a lot of problems, bugs, and so forth. Heck, it was a quantum leap ahead of Windows 2.0 in technology, so problems were to be expected. To fix these problems, Microsoft came out with Windows 3.1. The PR and marketing departments originally wanted to call it Windows 4.0, but Microsoft decided to simply call Windows 3.1 because it just didn't have enough features to qualify as a major revision upgrade. Nor did it live up to all the hype the marketing department had built up.
+
+Windows 3.1 was very solid. It had multimedia extensions like sound and video support, and it was a good all-around OS that got work done for the user in a uniform manner. In addition, there was another version called Windows 3.11 (Windows for Workgroups) with network support. The only problem was that Windows 3.1 was still a DOS application, for the most part, and ran under a DOS Extender.
+
+Windows 95
+On the other side of the planet, the game programming community was still chanting "DOS TILL HELL FREEZES OVER!", and I was out in front burning a Windows 3.1 box myself! However, in 1995 hell did start to freeze over… Windows 95 was released, and it was a true 32-bit, multitasking, multithreaded operating system. Granted, it had some 16-bit code left in it, but for the most part, Windows 95 was the ultimate development and release platform for the PC.
+
+(Of course, Windows NT 3.0 was also available. But NT just wasn't feasible for the average user, so I'm not even acknowledging it yet in my story.)
+
+When Windows 95 was released, it was the first time ever that I actually liked programming for Windows. I always hated Windows 1.0, 2.0, 3.0, and 3.1 for programming, although I hated it less and less with each release. But when Windows 95 came out, there was one thing that changed my mind, as well as a lot of other people's梚t looked cool! That's all I needed.
+
+TIP
+
+The most important thing in the game programming business is how the box looks and how the screen shots you send to magazines look. Sending the reviewers free stuff works too.
+
+
+
+So almost overnight, Windows 95 changed the computing business. Sure, many companies today are still using Windows 3.1 (can you believe that?), but Windows 95 made the Intel-based PC the computer of choice for all applications梕xcept games. Yes, DOS still had the hearts of game programmers, even though they knew it was only a matter of time.
+
+In 1996, Microsoft released the Game SDK, which was basically the first version of DirectX. This technology worked on Windows 95 only, but it was simply too slow to compete with DOS games such as DOOM and Duke Nukem. Developers continued to develop for DOS32, but they knew it was only a matter of time before the DirectX technology would be fast enough to make games on the PC.
+
+By version 3.0, DirectX was as fast as DOS32 on the same machines. By version 5.0, DirectX was very clean and the promises of the technology were coming true. Now, Microsoft is working on version 9.0, and version 8.1 is available. But, we'll talk more about that later when we cover DirectX in Chapter 5, "DirectX Fundamentals and the Dreaded COM." For now, just realize that Win32/DirectX is the only way to go on the PC for games. Back to the history lesson.
+
+Windows 98
+In mid-1998, Windows 98 was released. It's more of an evolutionary step than a revolutionary one, like Windows 95, but it's important nonetheless. Windows 98 is like a hot rod梚t's sleek, fast, and kicks ass! It's totally 32-bit, has support for everything you can think of, and is open-ended for expansion. And it has DirectX, multimedia, 3D graphics, networking, and the Internet all integrated into it very nicely.
+
+Windows 98 is also very robust compared to Windows 95. Sure, Windows 98 still crashes and tweaks out, but believe me, there is a lot less of that. Furthermore, plug-and-play actually works, and works well梚t's about time!
+
+Windows ME
+In late 1999, early 2000 Windows ME (or Millennium) was released. ME is hard to explain, basically a 98 box, but with tighter and more integrated multimedia support and networking. ME really is targeted more at the consumer rather than a technical or business market. As far as functionality though, it's basically Windows 98. However, ME is tighter and because of this has much more trouble running certain applications, some hardware doesn't like it and in general is only good for very NEW machines, whereas you can run 98 on computers that were made in 1995 and it works great. This is definitely not the case with ME. But, on a new machine, this is a fairly stable and robust gaming OS.
+
+Windows XP
+At the time of this revision (late 2001), the new OS Windows XP was just released and I have to tell you I really like it! XP is like is the sexiest OS I have seen, it has the feel of 98 or ME, with the stability and robustness of Windows 2000 or NT. XP is truly the next step in operating systems for the consumer. But, there is a dark side to all this. XP is a true 32-bit, Win32-compliant operating system, and for years Microsoft has been telling hardware manufacturers, and software developers to not cheat and do things the wrong way in relation to their code. Well, finally, it's time to pay the fiddler, and XP simply will NOT run a lot of software that breaks rules. This is a really good thing though, since in the end, all the software companies will recompile their programs taking all the hacks and hardware specific coding out of their programs. This is one of the reasons that 95, and 98 are so unstable, it's all that bad code! Therefore, XP is like starting over again, and saying, here is the coolest, slickest, OS you have ever seen, but if you want to play, you must play fair, and by the rules.
+
+However, to not be a complete disaster in reference to compatibility, XP has two things that help users get software running. First, the OS is continually updated via Microsoft update, and the companies are working around the clock to fix all their yucky software. And secondly, XP has what are called "compatibility" modes that you can run, "non-compliant" software with; in essence, you can turn on the "bugs" and the software will work.  Aside from all that, I suggest migrating to XP for development without hesitation, I love it.
+
+Windows NT/2000
+Now we can talk about Windows NT. At the time of this writing, Windows NT is currently on release release 5 4.0, but has been renamed for intents and purposes to Windows 2000 which is really release 5.0 of NT. And as far as I can tell, ultimately it's going to replace Windows 9X as the OS of choice for everyone as Windows XP converges with it. 2000 is simply a lot tighter than Windows 9X; furthermore, most game programmers develop on NT and then release on Windows 9X/ME/XP. The cool thing about 2000 is that it has full plug-and-play support, along with Win32/DirectX, so applications written for Windows 9X with DirectX will work on 2000. This is great news, since now game developers who write PC games have the largest market potential in history.
+
+So what's the bottom line? If you write a Win32 application with DirectX (or not), it will work on Windows 95, 98, ME, XP, and 2000. This is a good thing. Hence, everything you learn in this book is applicable to multiple operating systems. And don't forget Windows CE 3.0/Pocket PC 2002桪irectX and a subset of Win32 work on that system, too!
+
+Basic Windows Architecture: Win9X/NT
+Windows, unlike DOS, is a multitasking operating system designed to allow a number of applications and/or smaller processes to run at the same time, using the hardware to its fullest. This means that Windows is a shared environment ne application can't take over the entire system. Although Windows 95, 98, ME, XP, and 2000/NT are similar, there are a number of technical differences. However, as far as we are concerned here, we can generalize without too much drama. I will refer to the Windows machine as a Win 9X/NT or Windows box most of the time. So let's get started!

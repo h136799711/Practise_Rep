@@ -1,0 +1,21 @@
+Chapter 2. The Windows Programming Model
+"Lilu Dallas Multipass!"
+
+�Lilu, The 5th Element
+
+Windows programming is like going to the dentist: You know it's good for you, but no one likes doing it. Am I right? In this chapter, I'm going to show you the basics of Windows programming using my "Zen" methodology梠r, in other words, the easy way. I can't promise that you'll like going to the dentist after reading this chapter, but I can promise you that you'll like Windows programming a lot more than you ever did! Here's what you'll learn:
+
+The history of Windows
+
+Basic Windows architecture
+
+Windows' classes
+
+Creating Windows
+
+Windows event handlers
+
+Event-driven programming and event loops
+
+Opening multiple windows
+

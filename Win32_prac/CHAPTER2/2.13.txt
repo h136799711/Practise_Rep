@@ -1,0 +1,40 @@
+Opening More Windows
+Before finishing up this chapter, I want to cover one more quick topic that you might be wondering about梙ow do you open more than one window. Actually, this is trivial, and you already know how to do it. All you need to do is make two or more calls to CreateWindowEx() to create the windows, and that's it. However, there are some caveats to this.
+
+First, remember that when you create a window, it's based on a Windows class. This class, among other things, defines the WinProc or event handler for the entire class. This is a very important detail, so pay attention. You can make as many windows as you want with the same class, but all the messages for them will be sent to the same WinProc, as defined by the event handler pointed to by the lpfnWndProc field of the WINCLASSEX structure. To see this, take a look at Figure 2.11. It depicts the message flow in this case.
+
+Figure 2.11. The message flow for multiple windows with the same Windows class.
+This may or may not be want you want. If you want a different WinProc for each window, you must create more than one Windows class and create each window with a different class. Hence, a different WinProc is sent messages for each class window. Figure 2.12 shows this setup.
+
+Figure 2.12. Multiple Windows classes with multiple windows.
+With that in mind, here's the code to create two windows based on the same class:
+
+// create the first window
+if (!(hwnd = CreateWindowEx(NULL,               // extended style
+                WINDOW_CLASS_NAME,              // class
+               "Window 1 Based on WINCLASS1",   // title
+                WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                0,0,      // initial x,y
+                400,400,  // initial width, height
+                NULL,     // handle to parent
+                NULL,     // handle to menu
+                hinstance,// instance of this application
+                NULL)))   // extra creation parms
+return(0);
+
+// create the second window
+if (!(hwnd = CreateWindowEx(NULL,                  // extended style
+               WINDOW_CLASS_NAME,     // class
+                "Window 2 Also Based on WINCLASS1", // title
+                WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                100,100,  // initial x,y
+                400,400,  // initial width, height
+                NULL,     // handle to parent
+                NULL,     // handle to menu
+                hinstance,// instance of this application
+                NULL)))   // extra creation parms
+return(0);
+
+Of course, you might want to track each window handle in different variables rather than the same one, as is the case with hwnd, but you get the idea. For an example of opening two windows at once, take a look at DEMO2_5.CPP and the associated executable, DEMO2_5.EXE. When you run the .EXE, you should see something like Figure 2.13. Notice that when you close either window, they both close and the application terminates. See if you can figure out a way to close only one window at a time. (Hint: Create two Windows classes, and don't send a WM_QUIT message until both windows have been closed.)
+
+Figure 2.13. The multiple-window program DEMO2_5.EXE.

@@ -1,0 +1,41 @@
+Multitasking and Multithreading
+As I said, Windows allows a number of different applications to be executed simultaneously in a round-robin fashion, where each application gets a small time slice to run in and then the next application takes its turn. As you can see in Figure 2.1, the CPU is shared among a number of different applications in a circular manner. Figuring out the exact methodology that selects the next application, and the amount of time allotted to each application, is the job of the scheduler.
+
+Figure 2.1. Multiprocessing in action with a single processor.
+The scheduler may be very simple, running each application for a fixed number of milliseconds, or it may be very complex, giving applications various levels of priority and preempting applications or events with lower priority. In the case of Win 9X/NT, the scheduler is priority-based with preemption. This means that some applications can have more processor time than others, but if an application needs the CPU, the current task can be blocked or preempted while another task runs.
+
+However, you don't need to worry much about this unless you're writing OS or real-time code, where exact details matter. In most cases, Windows will run and schedule your application, and you will have nothing to do with it.
+
+Taking a closer look at Windows, we see that not only is it multitasking, but it's multithreaded. This means that programs are really composed of a number of simpler threads of execution. These threads are scheduled just like heavier-weight processes, such as programs. In fact, right now there are probably 30 to 50 threads running on your machine, performing various tasks. So in reality, you may have a single program running that consists of one or more threads of execution.
+
+Take a look at Figure 2.2 to see a more realistic multithreaded view of Windows. As you can see, each program actually consists of a number of worker threads in addition to the main thread.
+
+Getting Info on the Threads
+For some fun, let's see how many threads are running on your machine right now. On your Windows machine, press Ctrl+Alt+Delete to pop up the Active Program Task Manager, which displays all of the running tasks (or processes). This isn't exactly what we want, but it's close. What we really want is a tool or applet that displays the actual threads that are executing. A number of shareware and commercial utilities do this, but Windows comes with a couple of them built in.
+
+Within the directory that Windows was installed in (WINDOWS\, in most cases), you will find an executable named SYSMON.EXE (not included with default Windows installation梪ser needs to add it through Control Panel / Add/Remove Programs / System Tools) (Windows 95/98) or PERFMON.EXE (Windows NT). Figure 2.3 depicts SYSMON.EXE running on my Windows 98 machine. As you can see, there is a wealth of information in addition to the number of threads running, such as memory use and processor load. In fact, I like to keep SYSMON.EXE running as I develop so I can see what's going on and how the system is loaded.
+
+Figure 2.3. Running SYSM.
+You might be wondering if you have any control over the creation of threads. The answer is yes!!! In fact, this is one of the most exciting things about Windows game programming梬e can create as many threads as we want to perform other tasks in addition to our main game process.
+
+NOTE
+
+In Windows 98/NT, there is actually a new type of execution object called a fiber, which is even simpler than a thread. (Get it? Threads are made of fibers.)
+
+
+
+This is much different than how a DOS game is written. DOS is a single-threaded OS, meaning that once your program runs, it's the only thing running (except for an interrupt handler from time to time). Therefore, if you want any kind of multitasking or multithreading, you must simulate it yourself (check out Sams Teach Yourself Game Programming in 21 Days for a complete DOS-based multitasking kernel). And this is exactly what game programmers have been doing over the years. Granted, simulating multitasking and multithreading is nowhere near as robust as having a complete OS that supports them, but for a single game, it works well enough.
+
+Before we move into real Windows programming and the code that makes things happen, there is one detail that I want to mention. You might be thinking that Windows is a magical OS because it allows multiple tasks or programs to run at once. Remember, this is not true. If there is a single processor, only one execution stream, thread, program, or whatever you want to call it can run at a time. Windows just switches between them so quickly that it seems as if more than one program is running. On the other hand, if you have more than one processor, multiple programs can run. For example, I have a dual Pentium II computer, with two 400MHz Pentium II processors running Windows 2000. With this configuration, two instruction streams can be executed at the same time.
+
+In the near future, I would expect that new microprocessor architectures for personal computers will allow multiple threads or fibers to be executed as part of the processors' design. For example, the Pentium has two execution units梩he U pipe and V pipe. Hence, it can execute two instructions at once. However, these two instructions are always from the same thread. Similarly, the Pentium II, III, IV can execute multiple instructions at once, but again only from the same thread.
+
+The Event Model
+Windows is a multitasking/multithreaded OS, but it's also an event-driven OS. Unlike DOS programs, most Windows programs sit and wait for the user to do something, which fires an event, and then Windows responds to the event and takes action. Take a look at Figure 2.4 to see this graphically. It depicts a number of application windows, each sending their events or messages to Windows to be processed. Windows does some of the processing, but most of the messages or events are passed through to your application program for processing.
+The good news is that you don't need to concern yourself with the other applications that are running. Windows will handle them for you. All you have to worry about is your own application and the processing of messages for your window(s). This wasn't the entire truth in Windows 3.0/3.1. Those versions of Windows weren't true multitasking operating systems, and each application had to yield to the next. This meant that applications running under these versions had a rather rough or sluggish feel. If other applications were hogging the system, there wasn't anything that the compliant applications could do. However, this isn't the case with Windows 9X/NT. The OS will pull the rug out from under your application whenever it feels like it梠f course, it pulls it so quickly that you'll never notice!
+
+At this point, you know all you need to know about OS concepts. Luckily, Windows is such a nice OS to write games for these days that you won't have to worry about scheduling梐ll you need to worry about is the game code and pushing the machine to its limits.
+
+Later in this chapter, we'll get into some actual programming so you can see just how easy Windows programming is. But (there's always a but) before we do that, we need to cover some conventions that Microsoft programmers like to use. This way, you won't be bewildered by all the weird function and variable naming.
+
+

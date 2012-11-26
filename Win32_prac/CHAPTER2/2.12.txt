@@ -1,0 +1,48 @@
+Making a Real-Time Event Loop
+This type of real-time nonwaiting event loop is easy to make. All you need is a way to test if there is a message in the message queue. If there is, you can process it; otherwise, continue processing other game logic and repeat. The function that performs this test is called PeekMessage(). Its prototype is almost identical to GetMessage()'s, as shown here:
+
+BOOL PeekMessage(
+     LPMSG lpMsg,        // pointer to structure for message
+     HWND hWnd,          // handle to window
+     UINT wMsgFilterMin, // first message
+     UINT wMsgFilterMax, // last message
+     UINT wRemoveMsg);   // removal flags
+
+This returns nonzero if a message is available.
+
+The difference is in the last parameter, which controls how the messages should be retrieved from the message queue. The valid flags for wRemoveMsg are
+
+PM_NOREMOVE� Messages are not removed from the queue after processing by PeekMessage().
+
+PM_REMOVE� Messages are removed from the queue after processing by PeekMessage().
+
+Taking these two possibilities into consideration, you can do one of two things: Use PeekMessage() with PM_NOREMOVE and, if there is a message, call GetMessage(); or use PM_REMOVE and use PeekMessage() itself to retrieve a message if there is one. Use the latter. Here's the core logic, changed to reflect this new technique in the main event loop:
+
+while(TRUE)
+    {
+    // test if there is a message in queue, if so get it
+    if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+       {
+       // test if this is a quit
+       if (msg.message == WM_QUIT)
+       break;
+    // translate any accelerator keys
+    TranslateMessage(&msg);
+
+    // send the message to the window proc
+    DispatchMessage(&msg);
+    }  // end if
+
+    // main game processing goes here
+    Game_Main();
+}  // end while
+
+I've highlighted important points in the code. The first section in bold is
+
+if (msg.message == WM_QUIT) break;
+
+This is how you must detect to bail out of the infinite while(TRUE) loop. Remember, when a WM_DESTROY message is processed in the WinProc, it's your job to send a WM_QUIT message via the call to PostQuitMessage(). The WM_QUIT then trickles through the event queue, and you can detect it so you can bail out of the main loop.
+
+The last section of highlighted code simply indicates where you would put the call to your main game code loop. But remember, the call to Game_Main(),  whatever you call it , return after one frame of animation or game logic. Otherwise, messages won't be processed by the main Windows event loop.
+
+For an example of this new real-time structure that is more appropriate for game logic processing, take a look at the source DEMO2_4.CPP and the associated DEMO2_4.EXE on the CD-ROM. This structure will in fact be our model for the remainder of the book.

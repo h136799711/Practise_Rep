@@ -1,0 +1,92 @@
+Creating the Window
+To create a window (or any window-like object), you use the CreateWindow() or CreateWindowEx() function. The latter is a little newer and supports an additional style parameter, so let's use it. This is where the Windows class comes in, which we took so long to dissect piece by piece. When you create a window, you must supply the text name of the window class which in this case is "WINCLASS1". This is what identifies your Windows class and differentiates it from other classes, along with the built-in types like buttons, text boxes, etc.
+
+Here's the function prototype for CreateWindowEx():
+
+HWND CreateWindowEx(
+DWORD dwExStyle,      // extended window style
+LPCTSTR lpClassName,  // pointer to registered class name
+LPCTSTR lpWindowName, // pointer to window name
+     DWORD dwStyle,        // window style
+     int x,                // horizontal position of window
+     int y,                // vertical position of window
+     int nWidth,           // window width
+     int nHeight,          // window height
+     HWND hWndParent,      // handle to parent or owner window
+     HMENU hMenu,          // handle to menu, or child-window identifier
+HINSTANCE hInstance,  // handle to application instance
+LPVOID lpParam);      // pointer to window-creation data
+
+If the function is successful, it returns a handle to the newly created window; otherwise, it returns NULL.
+
+Most of the parameters are self-explanatory, but let's cover them anyway:
+
+dwExStyle� The extended styles flag is an advanced feature, and for most cases, you'll set it to NULL. However, if you're interested in all the possible values, take a look at the Win32 SDK Help梩here are a lot of them. About the only one I ever use is WS_EX_TOPMOST, which makes the window stay on top.
+
+lpClassName� This is the name of the class you want to create a window based on梖or example, "WINCLASS1".
+
+lpWindowName This is a null-terminated text string containing the title of the windows or example, "My First Window".
+
+dwStyle This is the general window flag that describes what the window looks like and how it behaves very important! See Table 2.10 for a list of some of the more popular values. Of course, you can logically OR these values together to get the various features you want.
+
+x,y This is the position of the upper left-hand corner of the window in pixel coordinates. If you don't care, use CW_USEDEFAULT and Windows will decide.
+
+nWidth, nHeight� This is the width and height of the window in pixels. If you don't care, use CW_USEDEFAULT and Windows will decide.
+
+hWndParent� This is the handle to the parent window, if there is one. Use NULL if there isn't a parent, and then the desktop will be the parent.
+
+hMenu� This is the handle to the menu to attach to the window. You'll learn more on this in the next chapter. Use NULL for now.
+
+hInstance� This is the instance of the application. Use hinstance from WinMain() here.
+
+lpParam� Advanced. Set to NULL.
+
+Table 2.10 lists the various window flags settings.
+
+Table 2.10. General Style Values for dwStyle 
+
+WS_POPUP  A pop-up window.  
+WS_OVERLAPPED  An overlapped window, which has a title bar and a border. Same as the WS_TILED style.  
+WS_OVERLAPPEDWINDOW  An overlapped window with the WS_OVERLAPPED, WS_CAPTION, WS_SYSMENU, WS_THICKFRAME, WS_MINIMIZEBOX, and WS_MAXIMIZEBOX styles.  
+WS_VISIBLE  A window that is initially visible.  
+WS_SYSMENU  A window that has a window menu on its title bar. The WS_CAPTION style must also be specified.  
+WS_BORDER  A window that has a thin-line border.  
+WS_CAPTION  A window that has a title bar (includes the WS_BORDER style).  
+WS_ICONIC  A window that is initially minimized. Same as the WS_MINIMIZE style.  
+WS_MAXIMIZE  A window that is initially maximized.  
+WS_MAXIMIZEBOX  A window that has a Maximize button. Cannot be combined with the WS_EX_CONTEXTHELP style. The WS_SYSMENU style must also be specified.  
+WS_MINIMIZE  A window that is initially minimized. Same as the WS_ICONIC style.  
+WS_MINIMIZEBOX  A window that has a Minimize button. Cannot be combined with the WS_EX_CONTEXTHELP style. The WS_SYSMENU style must also be specified.  
+WS_POPUPWINDOW  A pop-up window with WS_BORDER, WS_POPUP, and WS_SYSMENU styles. The WS_CAPTION and WS_POPUPWINDOW styles must be combined to make the window menu visible.  
+WS_SIZEBOX  A window that has a sizing border. Same as the WS_THICKFRAME style.  
+WS_HSCROLL  A window that has a horizontal scrollbar.  
+WS_VSCROLL  A window that has a vertical scrollbar.  
+Note: I have highlighted commonly used values. 
+
+
+And here's how you would create a basic overlapped window with the standard controls at position 0,0 with a size of 400,400 pixels:
+
+HWND hwnd; // window handle
+
+// create the window, bail if problem
+if (!(hwnd = CreateWindowEx(NULL, // extended style
+                  "WINCLASS1",            // class
+                  "Your Basic Window",    // title
+                  WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                  0,0,       // initial x,y
+                  400,400,   // initial width, height
+                  NULL,      // handle to parent
+                  NULL,      // handle to menu
+                  hinstance, // instance of this application
+                  NULL)))    // extra creation parms
+return(0);
+
+Once the window has been created, it may or may not be visible. However, in this case, we added the style flag WS_VISIBLE, which does this automatically. If this flag isn't added, use the following function call to manually display the window:
+
+// this shows the window
+ShowWindow(hwnd, ncmdshow);
+
+Remember the ncmdshow parameter of WinMain()? This is where it comes in handy. Although here you've overridden it by adding WS_VISIBLE, you would normally send it as the parameter to ShowWindow(). The next thing that you might want to do is force Windows to update your window's contents and generate a WM_PAINT message. This is accomplished with a call to UpdateWindow():
+
+// this sends a WM_PAINT message to window and makes
+

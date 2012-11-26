@@ -1,0 +1,6 @@
+
+I don't know about you, but I'm really excited! At this point, you have everything you need to start understanding much more complex Windows programming. You know about the q of Windows and multitasking, and you know how to create Window classes, register classes, create windows, write event loops and handlers, and a lot more! So pat yourself on the back (or, for my alien readers, lick your eyeballs). You have done a most excellent job <BG>.
+
+In the next chapter, we're going to cover some more Windows-related stuff, like using resources, creating menus, working with dialogs, and getting information.
+
+ 

@@ -1,0 +1,17 @@
+Real-World Windows Applications (Without Puck)
+Even though the goal of this book is to write 3D games that run on Windows, you don't need to know much about Windows programming. Actually, all you need is a basic Windows program that opens a window, processes messages, calls the main game loop, and that's it. With that in mind, my goal in this section is to first show you how to create simple Windows programs, but at the same time to lay the groundwork for a game programming shell application that looks like a 32-bit DOS machine.
+
+The main point of any Windows program is to open a window. A window is nothing more than a workspace that displays information, such as text and graphics, that the user can interact with. To create a fully functional Windows program, you only have to do a few things:
+
+Create a Windows class.
+
+Create an event handler or WinProc.
+
+Register the Windows class with Windows.
+
+Create a window with the previously created Windows class.
+
+Create a main event loop that retrieves and dispatches Windows messages to the event handler.
+
+Let's take a look at each step in detail.
+

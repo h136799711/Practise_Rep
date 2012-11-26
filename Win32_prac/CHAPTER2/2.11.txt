@@ -1,0 +1,181 @@
+The Main Event Loop
+The hard part is over! The main event loop is so simple, I'm just going to blurt it out and then talk about it:
+
+// enter main event loop
+while(GetMessage(&msg,NULL,0,0))
+    {
+    // translate any accelerator keys
+    TranslateMessage(&msg);
+
+    // send the message to the window proc
+    DispatchMessage(&msg);
+    } // end while
+
+That's it? Yup! Let's see what's going on here, shall we? The main while() is executed as long as GetMessage() returns a nonzero value. GetMessage() is the workhorse of the main event loop, and its sole purpose is to get the next message from the event queue and process it. You'll notice that there are four parameters to GetMessage(). The first one is important to us; however, the remaining parameters are set to NULL and 0. Here's the prototype, for reference:
+
+BOOL GetMessage(
+     LPMSG lpMsg,         // address of structure with message
+     HWND hWnd,           // handle of window
+     UINT wMsgFilterMin,  // first message
+     UINT wMsgFilterMax); // last message
+
+The msg parameter is (yes, you guessed it) the storage for Windows to place the next message in. However, unlike the msg parameter for WinProc(), this msg is a complex data structure rather than just an integer. Remember, by the time a message gets to the WinProc, it has been "cooked" and split apart into its constituent parts. Anyway, here is the MSG structure:
+
+typedef struct tagMSG
+        {
+        HWND hwnd;     // window where message occurred
+        UINT message;  // message id itself
+        WPARAM wParam; // sub qualifies message
+        LPARAM lParam; // sub qualifies message
+        DWORD  time;   // time of message event
+        POINT  pt;     // position of mouse
+        }  MSG;
+
+Starting to make sense, Jules? Notice that the parameters to WinProc() are all contained within this structure, along with some others, like the time and position of the mouse when the event occurred.
+
+So GetMessage() retrieves the next message from the event queue, but then what? Well, TranslateMessage() is called next. TranslateMessage() is a virtual accelerator key translator梚n other words, an input cooker. Just call it and don't worry about what it does. The final function, DispatchMessage(), is where all the action occurs. After the message is retrieved with GetMessage() and potentially processed and translated a bit with TranslateMessage(), the actual WinProc() is called by the call to DispatchMessage().
+
+DispatchMessage() makes the call to the WinProc, sending the appropriate parameters from the original MSG structure. Figure 2.9 shows the whole process in its final glory.
+
+Figure 2.9. The mechanics of event loop message processing.
+
+
+That's it, you're a Windows expert! If you grasp the concepts just covered and the importance of the event loop, event handler, and so on, that's 90 percent of the battle. The rest is just details.
+
+With that in mind, take a look at Listing 2.3. It's a complete Windows program that creates a single window and waits for you to close it.
+
+Listing 2.3 A Basic Windows Program
+// DEMO2_3.CPP - A complete windows program
+
+// INCLUDES ///////////////////////////////////////////////
+#define WIN32_LEAN_AND_MEAN  // just say no to MFC
+
+#include <windows.h>   // include all the windows headers
+#include <windowsx.h>  // include useful macros
+#include <stdio.h>
+#include <math.h>
+
+// DEFINES ////////////////////////////////////////////////
+
+// defines for windows
+#define WINDOW_CLASS_NAME "WINCLASS1"
+
+// GLOBALS ////////////////////////////////////////////////
+
+// FUNCTIONS //////////////////////////////////////////////
+LRESULT CALLBACK WindowProc(HWND hwnd,
+                  UINT msg,
+                            WPARAM wparam,
+                            LPARAM lparam)
+{
+// this is the main message handler of the system
+PAINTSTRUCT    ps;    // used in WM_PAINT
+HDC                    hdc;  // handle to a device context
+
+// what is the message
+switch(msg)
+    {
+    case WM_CREATE:
+        {
+    // do initialization stuff here
+
+        // return success
+    return(0);
+    } break;
+
+    case WM_PAINT:
+    {
+    // simply validate the window
+    hdc = BeginPaint(hwnd,&ps);
+    // you would do all your painting here
+        EndPaint(hwnd,&ps);
+
+        // return success
+    return(0);
+    } break;
+    case WM_DESTROY:
+    {
+    // kill the application, this sends a WM_QUIT message
+    PostQuitMessage(0);
+
+        // return success
+    return(0);
+    } break;
+
+    default:break;
+
+    } // end switch
+
+// process any messages that we didn't take care of
+return (DefWindowProc(hwnd, msg, wparam, lparam));
+
+} // end WinProc
+
+// WINMAIN ////////////////////////////////////////////////
+int WINAPI WinMain(HINSTANCE hinstance,
+            HINSTANCE hprevinstance,
+            LPSTR lpcmdline,
+            int ncmdshow)
+{
+
+WNDCLASSEX winclass; // this will hold the class we create
+HWND       hwnd;      // generic window handle
+MSG          msg;      // generic message
+
+// first fill in the window class structure
+winclass.cbSize  = sizeof(WNDCLASSEX);
+winclass.style     = CS_DBLCLKS | CS_OWNDC |
+                     CS_HREDRAW | CS_VREDRAW;
+winclass.lpfnWndProc    = WindowProc;
+winclass.cbClsExtra     = 0;
+winclass.cbWndExtra     = 0;
+winclass.hInstance      = hinstance;
+winclass.hIcon          = LoadIcon(NULL, IDI_APPLICATION);
+winclass.hCursor        = LoadCursor(NULL, IDC_ARROW);
+winclass.hbrBackground  = GetStockObject(BLACK_BRUSH);
+winclass.lpszMenuName   = NULL;
+winclass.lpszClassName  = WINDOW_CLASS_NAME;
+winclass.hIconSm        = LoadIcon(NULL, IDI_APPLICATION);
+
+// register the window class
+if (!RegisterClassEx(&winclass))
+    return(0);
+
+// create the window
+if (!(hwnd = CreateWindowEx(NULL, // extended style
+                  WINDOW_CLASS_NAME,   // class
+                 "Your Basic Window", // title
+                  WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                  0,0,        // initial x,y
+                  400,400,  // initial width, height
+                  NULL,        // handle to parent
+                  NULL,        // handle to menu
+                  hinstance,// instance of this application
+                  NULL)))    // extra creation parms
+return(0);
+
+// enter main event loop
+while(GetMessage(&msg,NULL,0,0))
+      {
+      // translate any accelerator keys
+      TranslateMessage(&msg);
+
+      // send the message to the window proc
+      DispatchMessage(&msg);
+      } // end while
+
+// return to Windows like this
+return(msg.wParam);
+
+} // end WinMain
+
+///////////////////////////////////////////////////////////
+
+To compile DEMO2_3.CPP, simply create a Win32 .EXE application and add DEMO2_3.CPP to the project. Or if you like, you can run the precompiled program, DEMO2_3.EXE, off the CD-ROM. Figure 2.10 shows the program in action. It's not much to look at, but what do you want? This is a paperback book!
+
+Figure 2.10. DEMO2_3.EXE in action.
+
+
+There are a couple of issues that I want to hit you with before moving on. First, if you take a close look at the event loop, it doesn't look all that real-time. Meaning that while the program waits for a message via GetMessage(), the main event loop is basically blocked. This is very true; you must somehow get around this, since you need to perform your game processing continuously and handle Windows events if and when they come.
+
+ 

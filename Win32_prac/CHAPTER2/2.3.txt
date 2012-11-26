@@ -1,0 +1,127 @@
+Programming the Microsoft Way: Hungarian Notation
+If you're running a company like Microsoft, with thousands of programmers working on various projects, at some point you have to come up with a standard way of writing code. Otherwise, chaos ensues. Therefore, a man named Charles Simonyi was put in charge of creating a specification for writing Microsoft code. This spec has been used ever since as a basic guideline for writing code. All Microsoft APIs, interfaces, technical articles, and so on use these conventions.
+
+The specification is generally referred to as Hungarian notation, probably because creating it and working those late hours made him hungry. Or maybe it was because he was from Hungary. We'll never know. The point is, you have to learn it so you can read Microsoft code.
+
+Hungarian notation consists of a number of conventions relating to naming:
+
+Variables
+
+Functions
+
+Types and constants
+
+Classes
+
+Parameters
+
+Table 2.1 contains all the prefix codes used in Hungarian notation. These codes are used to prefix variable names in most cases, along with other conventions depending on what is being named. Refer to the table for the remaining explanations.
+
+Table 2.1. The Hungarian Notation Prefix Codes Specification Prefix  Data Type (Base Type)  
+c  char  
+by  BYTE (unsigned char)  
+n  short or int (refers to a number)  
+i  int  
+x, y  short (used as x-coordinate or y-coordinate, generally)  
+cx, cy  short (used to denote x or y lengths; c stands for count)  
+b  BOOL (int)  
+w  UINT (unsigned int) or WORD (unsigned WORD)  
+l  LONG (long)  
+dw  DWORD (unsigned long)  
+fn  Function pointer  
+s  String  
+sz, str  String terminated by 0 byte  
+lp  32-bit long pointer  
+h  Handle (used to refer to Windows objects)  
+msg  Message  
+
+
+Variable Naming
+With Hungarian notation, variables are prefixed by the codes in Table 2.1. In addition, if a variable name is made up of one or more subnames, each subname is capitalized. Here are some examples:
+
+char *szFileName; // a null terminated string
+
+int *lpiData;     // a 32-bit pointer to an int
+BOOL bSemaphore;  // a boolean value
+
+WORD dwMaxCount;  // a 32-bit unsigned WORD
+
+Although I know of no specification for local variables of a function, there is a loose one for globals:
+
+int g_iXPos;      // a global x-position
+
+int g_iTimer;     // a global timer
+
+char *g_szString; // a global NULL terminated string
+
+Basically, you begin the variable with g_, or sometimes just plain g. "When I grew up, I was a big G, lots of money…" Sorry, I had a rap attack <BG>.
+
+Function Naming
+Functions are named in the same way variables are, but without the prefixes. In other words, just capitalize all the first letters of subnames. Here are some examples:
+
+int PlotPixel(int ix, int iy, int ic);
+
+void *MemScan(char *szString);
+
+Also, underscores are illegal. For example, the following wouldn't be a valid Hungarian-compliant function name:
+
+int Get_Pixel(int ix, int iy);
+
+Type and Constant Naming
+All types and constants are in uppercase, but you're allowed to use underscores in the names. For example:
+
+const LONG NUM_SECTORS = 100; // a C++ style constant
+
+#define MAX_CELLS 64          // a C style constant
+
+#define POWERUNIT 100         // a C style constant
+
+typedef unsigned char UCHAR;  // a user defined type
+
+Nothing too unusual here梖airly standard definitions. Although most Microsoft programmers don't use underscores, I prefer to use them because it makes the names more readable.
+
+TIP
+
+In C++, the const keyword has more than one meaning, but in the preceding code lines, it's used to create a constant variable. This is similar to #define, but it has the added property of retaining the type information. const is more like a variable than a simple preprocessed text replacement like #define. It allows compiler type-checking and casting to occur.
+
+
+
+Class Naming
+The naming conventions used for classes might bother you a bit. However, I have seen many people who use this convention and just made it up on their own. Anyway, all C++ classes must be prefixed by a capital C, and the first letter of each subname of the class name must be capitalized. Here is an example:
+
+class CVector
+{
+public:
+CVector() {ix=iy=iz=imagnitude = 0;}
+CVector(int x, int y, int z) {ix=x; iy=y; iz=z;}
+.
+.
+
+private:
+int ix,iy,iz;   // the position of the vector
+int imagnitude;  // the magnitude of the vector
+
+};
+
+Parameter Naming
+Parameters to functions follow the same naming conventions that normal variables do. However, this is not a necessity. For example, you might see a function definition that looks like this:
+
+UCHAR GetPixel(int x, int y);
+
+In this case, the more Hungarian prototype would be
+
+UCHAR GetPixel(int ix, int iy);
+
+But I have seen it both ways.
+
+And finally, you might not even see the variable names, but just the types, as in this example:
+
+UCHAR GetPixel(int, int);
+
+Of course, this would only be used for the prototype, and the real function declaration must have variable names to bind to, but you get the point.
+
+NOTE
+
+Just because you know how to read Hungarian notation doesn't mean that you have to use it! In fact, I have been programming for over 20 years, and I'm not going to change my programming style for anyone (well, maybe Pamela Anderson). Hence, the code in this book will use a Hungarian-like coding style where Win32 API functions are concerned, but it'll use my own style in other places. One thing is for certain桰'm not capitalizing each word of my variable names! And I'm using underscores, too!
+
+
