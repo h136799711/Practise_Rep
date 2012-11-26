@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding=
+"utf-8" ?>
+<?xml-stylesheet type="text/xsl" href="templates/main.xsl" ?>
+<xmlsite>
+	<head>
+		<title>简易的图书管理系统</title>
+		<csslinks>
+			<href>../asset/main.css</href>
+		</csslinks>
+	</head>
+	<body>
+		
+	</body>
+</xmlsite>

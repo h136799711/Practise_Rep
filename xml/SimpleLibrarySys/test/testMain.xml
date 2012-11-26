@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xml-stylesheet type="text/xsl" href="../templates/main.xsl" ?>
+<xmlsite>
+	<head>
+		<title>简易图书管理系统</title>
+		<csslinks>
+			<href>../asset/main.css</href>
+		</csslinks>
+	</head>
+	<body>
+		<img src="../asset/logo."	/>
+		<a href="#" title="我是超链接的title1">我是超链接1，我有href，title属性</a>
+		<a href="#" title="我是超链接的title2">我是超链接2，我有href，title属性</a>
+	</body>
+</xmlsite>
