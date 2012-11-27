@@ -13,3 +13,59 @@ body{
 	border-right-colors:#abc;
 	border-top-colors:#abc;
 }
+ul{
+	list-style-type:none;	
+	-moz-padding-start: 15;
+	-webkit-margin-before: 10;
+	-webkit-margin-after: 0;
+	-webkit-padding-start: 15;
+}
+a{
+	color:#0;
+	text-decoration:none;	
+}
+a:link{
+	color:#aa00ff;
+	text-decoration:none;
+}
+a:hover{
+	color:#f7f7aa;
+	background-color:#5566dd;
+}
+a:visited{
+	color:#550077;
+}
+
+.center{
+	border:5px;
+	background-color:#dd7;
+	height:100%;
+}
+
+.login{
+	border:0px solid #aaa;
+	padding-top:10px;
+	margin:1px;
+	width:200px;
+	height:150px;	
+	background-color:#F0E68C;
+}
+.login ul li {
+	margin-top:3px;
+	margin-bottom:3px;
+	float:left;
+}
+.login ul li span{
+	color:#992233;
+}
+.login ul li label{
+	margin-right:10px;
+}
+.login ul li a{
+	color:#aa00ff;
+	margin-left:10px;
+}
+.login ul li:last-child{
+	text-align:center;
+	margin:0 auto;
+}

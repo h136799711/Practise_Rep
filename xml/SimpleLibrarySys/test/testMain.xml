@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<?xml-stylesheet type="text/xsl" href="../templates/main.xsl" ?>
+<?xml-stylesheet type="text/xsl" href="../index.xsl" ?>
 <xmlsite>
 	<head>
 		<title>简易图书管理系统</title>
 		<csslinks>
 			<href>../asset/main.css</href>
 		</csslinks>
+		<scriptlinks>
+			<script href="../asset/server.js"></script>
+			<script href="../asset/utils.js"></script>
+			<script href="../asset/users.js"></script>
+			<script href="">
+				(function(){				
+					function onload(){
+						console.log("onload");
+						console.log(typeof server === "object");
+						var ele = utils.getEleById("login_link");
+						utils.addEvent(ele,"click",user.onLogin);
+						ele = utils.getEleById("register_link");
+						utils.addEvent(ele,"click",user.onRegister);
+					}
+					utils.addEvent(window,"load",onload);
+					console.log("addEvent");
+				})();
+			</script>
+		</scriptlinks>
 	</head>
-	<body>
-		<img src="../asset/logo."	/>
-		<a href="#" title="我是超链接的title1">我是超链接1，我有href，title属性</a>
-		<a href="#" title="我是超链接的title2">我是超链接2，我有href，title属性</a>
+	<body class="center">
+			<a href="index.xml" title="去首页">首页</a>
+			<login class="login">
+				<login_href >pages/login.xml</login_href >
+				<register_href>pages/register.xml</register_href>
+			</login>
 	</body>
 </xmlsite>
