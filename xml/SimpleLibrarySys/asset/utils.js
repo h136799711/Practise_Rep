@@ -34,14 +34,12 @@ var utils = (function(){
 		else if (document.implementation&&document.implementation.createDocument)
 		{
 			xmlDoc    = document.implementation.createDocument('', '', null);
-			if(xmlDoc.load){
-				xmlDoc.load(xmlFile);
-			}else{
-				var xmlhttp = new window.XMLHttpRequest();
-				xmlhttp.open("GET", xmlFile, false);
-				xmlhttp.send(null);
-				xmlDoc = xmlhttp.responseXML;
-			}
+			
+			var xmlhttp = new window.XMLHttpRequest();
+			xmlhttp.open("GET", xmlFile, false);
+			xmlhttp.send(null);
+			xmlDoc = xmlhttp.responseXML;
+			
 		}
 		else
 		{ 

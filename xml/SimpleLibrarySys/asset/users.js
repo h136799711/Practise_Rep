@@ -5,7 +5,12 @@ var user = (function(){
 		var pwd = ele.value;
 		ele = document.getElementById("username");
 		var name = ele.value;
-		if(utils.cookies.get("loginedName")){			
+		console.log(name+pwd);
+		
+		if(!!!pwd || !!!name){			
+			alert("用户名或密码不能为空");
+		}
+		else if(utils.cookies.get("loginedName")){			
 			window.location.href="index.xml";
 		}else if(valid(name,pwd)){
 			utils.cookies.set("loginedName",name,1);
@@ -35,12 +40,12 @@ var user = (function(){
 	
 	var valid = function(username,pwd){
 		var tmp = utils.loadXML("data/users.xml");
-	//	console.log(users);
 		var data = tmp.getElementsByTagName("user");
+		console.log(data.length);
 		for(var i=0;i<data.length;i++)
 		{
-			//		console.log(utils.getAttrValue(tmp,"username"));
-			if(utils.getAttrValue(data[i],"username") === username && pwd && utils.getAttrValue(data[i],"password") === pwd){
+			console.log(utils.getAttrValue(data[i],"username"));
+			if(utils.getAttrValue(data[i],"username") === username &&(!pwd ||  (pwd && utils.getAttrValue(data[i],"password") === pwd)) ){
 				return true;
 			}
 		}
@@ -72,7 +77,6 @@ var user = (function(){
 				}
 			}
 		}
-		return false;
 	}
 	
 	return {

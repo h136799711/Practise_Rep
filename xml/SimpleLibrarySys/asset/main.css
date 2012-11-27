@@ -8,20 +8,19 @@ body{
 	-moz-border-left-colors:#abc;
 	-moz-border-right-colors:#abc;
 	-moz-border-top-colors:#abc;
-	border-bottom-colors:#abc;
-	border-left-colors:#abc;
-	border-right-colors:#abc;
-	border-top-colors:#abc;
 }
 ul{
 	list-style-type:none;	
-	-moz-padding-start: 15;
+	-moz-padding-start: 15px;
 	-webkit-margin-before: 10;
 	-webkit-margin-after: 0;
 	-webkit-padding-start: 15;
 }
+img{
+	cursor:pointer;
+}
 a{
-	color:#0;
+	color:#000;
 	text-decoration:none;	
 }
 a:link{
@@ -35,7 +34,10 @@ a:hover{
 a:visited{
 	color:#550077;
 }
-
+.logo{
+	width:100%;
+	height:30px;
+}
 .center{
 	border:5px;
 	background-color:#dd7;
@@ -69,3 +71,43 @@ a:visited{
 	text-align:center;
 	margin:0 auto;
 }
+
+.right-side{
+	float:left;
+	margin:10px;
+	background-color:#F0E68C;
+	width:70%;
+}
+.left-side{
+	float:left;
+	margin:10px;
+}
+.book{
+	border:1px solid #F5F88F;
+	float:left;
+	width:210px;
+	height:280px;
+	margin:10px;	
+}
+
+.book img{
+	float:left;
+	margin:5;
+}
+.bookinfo{
+}
+.bookinfo p{
+	color:#6eaa66;
+	margin:0;
+	
+}
+.bookinfo span{
+	color:#e666ee;
+}
+.logo{
+	font-size:30px;
+	color:#6eaa66;
+	text-align:center;
+}
+
+

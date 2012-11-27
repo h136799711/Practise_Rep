@@ -57,7 +57,11 @@
 	<body >
 		<xsl:attribute name="class" >		
 			<xsl:value-of select="@class"/>
-		</xsl:attribute>		
+		</xsl:attribute>
+		<div class="logo">
+		简易图书管理网站
+		</div>		
+		<div  class="left-side">
 		<xsl:call-template name="A"  >
 			<xsl:param name="a" select="a"/>
 		</xsl:call-template>		
@@ -65,13 +69,52 @@
 		<xsl:call-template name="Login"  >
 			<xsl:param name="login" select="login"/>
 		</xsl:call-template>
-		
-		
+		<!-- search ,type-->
+		</div>
+		<div class="right-side">
+		<xsl:call-template name="Books"  >
+			<xsl:param name="book" select="book"/>
+		</xsl:call-template>
+		</div>
+		<div style="clear:both;"></div>
 	</body>	
 	</xsl:template>	
 	
+	<!-- books -->
 	
-	
+	<xsl:template name="Books">
+		<xsl:param name="book"/>
+		<xsl:for-each select="book">
+		<div class="book">
+			<div class="bookimg">
+			<xsl:element name="img">
+				<xsl:attribute name="src">
+					<xsl:value-of  select="img/@href" />
+				</xsl:attribute>
+				<xsl:attribute name="alt">
+					<xsl:value-of  select="@name" />
+				</xsl:attribute>
+				<xsl:attribute name="title">
+					<xsl:value-of  select="@name" />
+				</xsl:attribute>
+			</xsl:element>
+			</div>
+			<div class="bookinfo">
+			<p>
+			<span>	作者： </span>		
+			<xsl:value-of  select="@author" />
+			</p>
+			<p>
+			<span>	类别： </span>		
+			<xsl:value-of  select="@type" />
+			</p>
+			<p><span>	简介： </span>			
+			<xsl:value-of  select="desc" />
+			</p>
+			</div>
+		</div>
+		</xsl:for-each>	
+	</xsl:template>
 	
 	<!-- a -->
 	<xsl:template name="A">
@@ -112,7 +155,7 @@
 				<xsl:attribute name="href">
 					<xsl:value-of select="login_href" />
 				</xsl:attribute>登录</a>
-				<a  id="register_link" title="输入信息点击即可注册">		
+				<a  id="register_link" title="输入信息点击即可注册，可能有1分钟延迟">		
 				<xsl:attribute name="href">
 					<xsl:value-of select="register_href" />
 				</xsl:attribute>注册</a>
