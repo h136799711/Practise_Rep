@@ -7,7 +7,6 @@
 			<href>asset/main.css</href>
 		</csslinks>
 		<scriptlinks>
-			<script href="asset/server.js"></script>
 			<script href="asset/utils.js"></script>
 			<script href="asset/users.js"></script>
 			<script >
