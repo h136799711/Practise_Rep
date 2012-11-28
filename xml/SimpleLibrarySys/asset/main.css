@@ -12,9 +12,9 @@ body{
 ul{
 	list-style-type:none;	
 	-moz-padding-start: 15px;
-	-webkit-margin-before: 10;
-	-webkit-margin-after: 0;
-	-webkit-padding-start: 15;
+	-webkit-margin-before: 10px;
+	-webkit-margin-after: 0px;
+	-webkit-padding-start: 15px;
 }
 img{
 	cursor:pointer;
@@ -61,6 +61,10 @@ a:visited{
 	width:200px;
 	height:150px;	
 	background-color:#F0E68C;
+}
+.login ul  {
+	padding:15px;
+	margin-left:10px;
 }
 .login ul li {
 	margin-top:3px;
