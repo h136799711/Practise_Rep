@@ -9,7 +9,6 @@
 		<scriptlinks>
 			<script href="asset/utils.js"></script>
 			<script href="asset/users.js"></script>
-			<script href="asset/users.js"></script>
 			<script >
 				(function(){				
 					function onSearch(){
@@ -74,7 +73,22 @@
 				<item type="search"></item>
 			</panel>
 			<panel title="说明面板">
-				<item>在FireFox下打开最好，可在搜索中输入文字进行查询根据类别，注册依赖PHP操纵XML文件</item>				
+				<item type="a" target="_blank" href="
+				http://www.hebidu.cn/xmlsite/index.xml">
+				如果不能显示或其他错误可以点击我查看效果
+				</item>
+				<item>				
+				1.注册依赖PHP操纵XML文件所以需要支持能解析PHP的服务器
+				</item>
+				<item>2.测试用户:test,密码:test，也可注册	                                                               </item>
+				<item>				3.输入用户名和密码即可点击注册，请等候1分钟左右在登录即可用自己注册的账户登录
+				</item>
+				<item>				
+				4.在FireFox 16.0.2,IE 8下运行成功
+				</item>
+				<item>				
+				5.可在搜索中输入文字进行查询根据类别
+				</item>						
 			</panel>
 			<books name="books">
 			<book name="全球论剑" type="玄幻" author="网络黑侠">

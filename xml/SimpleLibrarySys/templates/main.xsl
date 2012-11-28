@@ -33,6 +33,7 @@
 			<xsl:attribute name="type">text/css</xsl:attribute>	   
 		</xsl:element>	    
 	</xsl:for-each>
+	
 	<xsl:for-each select="scriptlinks/script">	
 		<xsl:element name="script">	    
 			<xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -144,7 +145,7 @@
 					</xsl:when>	
 					<xsl:when test="@type='search'">
 						<p>
-						<input id="search_words" title="书的类别作为关键字" type="text" value="玄幻"  style="width:60%;"/>
+						<input id="search_words" title="书的类别作为关键字" type="text" value="科幻"  style="width:60%;"/>
 						<input title="搜索即可" id="search_btn" type="button" value="搜索" />
 						</p>
 					</xsl:when>	
