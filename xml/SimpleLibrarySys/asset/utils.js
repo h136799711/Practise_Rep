@@ -86,6 +86,42 @@ var utils = (function(){
 		  }
 		return "";
 	};
+	var createTag = function(tagName){
+		return document.createElement(tagName);
+	};
+	var getQueryString = function (name) {
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+		var r = window.location.search.substr(1).match(reg);
+		if (r != null) {
+			return unescape(r[2]); 
+		}
+		return null;
+    };
+	var queryAll  = function(ele,param){
+	for(var i=0;i<3;i++){
+		
+	}
+		return ele.querySelectorAll(param);
+	};
+	var query  = function(ele,param){
+		return ele.querySelector(param);
+	};
+	var hide= function(ele){
+		ele.style.display = "none";
+	};
+	var show=function(ele){
+		ele.style.display = "block";
+	};
+	var attr = function(ele,att,value){
+		if(value){
+			ele.setAttribute(att,value);
+		}else{
+			return ele.getAttribute(att);
+		}
+	};
+	var getBaseURL = function(){
+		return document.URL.split("?")[0];
+	};
 	return {
 		addEvent:addEvent,
 		loadXML : loadXML,
@@ -93,10 +129,44 @@ var utils = (function(){
 		getEleById:getEleById,
 		getAttrValue:getAttrValue,
 		createNode:createNode,
+		createTag:createTag,
+		getQueryString:getQueryString,
+		queryAll:queryAll,
+		query:query,
+		hide:hide,
+		show:show,
+		attr:attr,
+		getBaseURL:getBaseURL,
 		cookies:{
 			get:get,
 			set:set
 		}
 	};
+	
+})();
+
+var bookado = (function(){
+		
+		var selectByType = function(type){
+			var books = utils.queryAll(document,".book");
+						
+			//console.log("type= "+type+",book len= "+books.length);
+			
+			for(var i=0,len=books.length;i<len;i++){
+				var typenode = utils.query(books[i],".type");
+				
+				console.log("bookNode type "+typenode.innerHTML+" select type= "+type);
+				if(typenode && typenode.innerHTML && typenode.innerHTML.indexOf(type) !== -1){
+					utils.show(books[i]);
+					console.log("show");
+				}else{
+					utils.hide(books[i]);
+					console.log("hide");
+				}
+			}
+		};
+		return {
+			selectByType:selectByType
+		};
 	
 })();

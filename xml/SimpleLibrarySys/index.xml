@@ -9,23 +9,49 @@
 		<scriptlinks>
 			<script href="asset/utils.js"></script>
 			<script href="asset/users.js"></script>
+			<script href="asset/users.js"></script>
 			<script >
 				(function(){				
+					function onSearch(){
+						var sw = utils.getEleById("search_words").value;
+						
+						var newurl = utils.getBaseURL()+"?booktype="+escape(sw);
+						window.location.href = newurl;
+					}
+					function execQueryString(booktype){
+						if(!booktype){
+							return ;
+						}
+						
+						bookado.selectByType(booktype);
+					}
 					function onload(){				
-						var ln =  utils.cookies.get("loginedName");
+						var ele,ln =  utils.cookies.get("loginedName");
 						if(ln){
 							//console.log("logined");
 							var login = utils.getEleById("login");
-							login.innerHTML = "<ul style="margin-top:20px;"><li><label>用户</label><span style="
-	color:#881133;">"+ln+"</span><label>已登录</label></li></ul>";
-
+							var content =  "<div><ul><li>用户<span style="
+	color:#881133;">"+ln+"</span>已登录</li></ul></div>";
+							login.innerHTML = content;
+							ele = utils.createTag("a");
+							ele.href = "#";
+							ele.innerHTML = "注销";
+					//alert(ele);							
+							login.appendChild(ele);
+							utils.addEvent(ele,"click",user.onLogout);
 						}else{
 							//console.log("onload");
-							var ele = utils.getEleById("login_link");
+							ele = utils.getEleById("login_link");
 							utils.addEvent(ele,"click",user.onLogin);
 							ele = utils.getEleById("register_link");
-							utils.addEvent(ele,"click",user.onRegister);
-						}
+							utils.addEvent(ele,"click",user.onRegister);							
+							ele = utils.getEleById("buy_link");
+							
+						}						
+						execQueryString(utils.getQueryString("booktype"));
+						
+						ele = utils.getEleById("search_btn");
+						utils.addEvent(ele,"click",onSearch);
 					}
 					utils.addEvent(window,"load",onload);
 					console.log("addEvent");
@@ -33,10 +59,24 @@
 			</script>
 		</scriptlinks>
 	</head>
-	<body class="center">
+	<body class="center" logo="简易图书网站">
 			<login class="login">
 			</login>
-			
+			<booksNav>
+				<item href="?booktype=%u7384%u5E7B">玄幻</item>
+				<item href="?booktype=%u7A7F%u8D8A">穿越</item>
+				<item href="?booktype=%u79D1%u5E7B">科幻</item>
+			</booksNav>
+			<panel title="功能面板">
+				<item type="a" target="_blank" href="shoppingcart.xml">
+					查看购物车>>
+				</item>
+				<item type="search"></item>
+			</panel>
+			<panel title="说明面板">
+				<item>在FireFox下打开最好，可在搜索中输入文字进行查询根据类别，注册依赖PHP操纵XML文件</item>				
+			</panel>
+			<books name="books">
 			<book name="全球论剑" type="玄幻" author="网络黑侠">
 				<desc>　重回江湖…… 血雨腥风！ 追逐‘一帝二后三王七侯’三年之久的陈凯心； 《全球论剑在华山》大赛前夕，不料被阴险小人灌醉，随后被轮白到新人阶段，彻底错失跻身江湖顶尖强者行列机会！ 万念…</desc>
 				<img href="asset/images/1.jpg"></img>
@@ -60,7 +100,7 @@
 			</book>
 			
 			
-			<book name="吞噬星空" type="科技" author="我吃西红柿">
+			<book name="吞噬星空" type="科幻" author="我吃西红柿">
 				<desc> 　继《九鼎记》《盘龙》《星辰变》《寸芒》《星峰传说》后，番茄的第六本书！ —————— 简介： 星空中。 “这颗星球，通体土黄色，没有任何生命存在，直径21000公里，咦，竟然蕴含‘星泪金’…
 				</desc>
 				<img href="asset/images/5.jpg"></img>
@@ -110,7 +150,7 @@
 				</desc>
 				<img href="asset/images/12.jpg"></img>
 			</book>
-			
+			</books>
 			
 	</body>
 </xmlsite>

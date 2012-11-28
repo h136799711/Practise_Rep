@@ -59,33 +59,135 @@
 			<xsl:value-of select="@class"/>
 		</xsl:attribute>
 		<div class="logo">
-		简易图书管理网站
+			<xsl:value-of select="@logo" />
 		</div>		
 		<div  class="left-side">
 		<xsl:call-template name="A"  >
-			<xsl:with-param name="a" select="a"/>
 		</xsl:call-template>		
 		
 		<xsl:call-template name="Login"  >
-			<xsl:with-param name="login" select="login"/>
 		</xsl:call-template>
-		<div style="font-size:16px;color:#77dddd;position:absolute;left:10px;top:10px;">在IE6.0，FireFox下通过</div>
-		<!-- search ,type-->
+		<div style="font-size:16px;color:#77aa88;position:absolute;left:10px;top:10px;">在IE6.0，FireFox下本地测试通过
 		</div>
+		<!-- search ,type-->
+		
+		
+		<xsl:call-template name="Panel"  >
+		</xsl:call-template>
+		
+		</div>
+		
+		
+		
 		<div class="right-side">
+		<xsl:call-template name="Shoppingcart"  />
+		
+		<xsl:call-template name="BooksNav"  >
+		</xsl:call-template>
+		
 		<xsl:call-template name="Books"  >
-			<xsl:with-param name="book" select="book"/>
 		</xsl:call-template>
 		</div>
 		<div style="clear:both;"></div>
 	</body>	
 	</xsl:template>	
 	
+	<!-- shoppingcart -->
+	<xsl:template name="Shoppingcart">
+		<xsl:for-each select="shoppingcart">
+		<div class="shoppingcart">
+		<table id="shoppingcart">
+			<tr>
+				<th>书名</th>
+				<th>价格</th>
+				<th>数量</th>
+			</tr>
+			<xsl:for-each select="item">
+				<tr>
+					<td><xsl:value-of select="@name" /></td>
+					<td><xsl:value-of select="@price" /></td>
+					<td><xsl:value-of select="@count" /></td>
+				</tr>
+			</xsl:for-each>
+		</table>
+		<p>总价:<span class="total-price">77</span></p>
+		</div>
+		</xsl:for-each>
+	</xsl:template>
+
+	<!-- Panel -->
+	<xsl:template name="Panel">
+		<xsl:for-each select="panel">
+		<div class="panel">
+		<xsl:choose>
+			<xsl:when test="@title!=''">
+			<span><xsl:value-of select="@title"/></span>
+			</xsl:when>
+			<xsl:otherwise>
+				
+			</xsl:otherwise>
+		</xsl:choose>
+		<ul>
+		<xsl:for-each select="item">
+			<li>
+				<xsl:choose>
+					<xsl:when test="@type='a'">
+						<a title="点击" class="buy">
+							<xsl:attribute name="href">
+								<xsl:value-of select="@href" />
+							</xsl:attribute>
+							<xsl:attribute name="target">
+								<xsl:value-of select="@target" />
+							</xsl:attribute>
+							<xsl:value-of select="." />
+						</a>
+					</xsl:when>	
+					<xsl:when test="@type='search'">
+						<p>
+						<input id="search_words" title="书的类别作为关键字" type="text" value="玄幻"  style="width:60%;"/>
+						<input title="搜索即可" id="search_btn" type="button" value="搜索" />
+						</p>
+					</xsl:when>	
+					<xsl:otherwise>
+							<xsl:value-of select="." />						
+					</xsl:otherwise>				
+				</xsl:choose>
+			</li>
+		</xsl:for-each>
+		</ul>
+		<div class="clear-left"></div>
+		</div>
+		</xsl:for-each>
+	</xsl:template>
+	
+	<!-- BooksNav -->
+	<xsl:template name="BooksNav">
+	<xsl:for-each select="booksNav">				
+		<div class="books-nav">
+			<ul>
+				<li><span>热门分类: </span></li>	
+				<xsl:for-each select="item">
+				<li>	
+					<a  >
+					<xsl:attribute name="href">
+						<xsl:value-of select="@href" />
+					</xsl:attribute>
+					<xsl:attribute name="title">
+						<xsl:value-of select="." />
+					</xsl:attribute>
+					<xsl:value-of select="." />
+					</a>
+				</li>
+				</xsl:for-each>
+			</ul>
+		</div>
+		</xsl:for-each>
+	</xsl:template>
+		
 	<!-- books -->
 	
 	<xsl:template name="Books">
-		<xsl:param name="book"/>
-		<xsl:for-each select="book">
+		<xsl:for-each select="books/book">
 		<div class="book">
 			<div class="bookimg">
 			<xsl:element name="img">
@@ -102,12 +204,19 @@
 			</div>
 			<div class="bookinfo">
 			<p>
+			<a href="#" title="放入购物车" class="buy" id="buy_link">	
+			放入购物车 
+			</a>		
+			</p>
+			<p>
 			<span>	作者： </span>		
 			<xsl:value-of  select="@author" />
 			</p>
 			<p>
 			<span>	类别： </span>		
-			<xsl:value-of  select="@type" />
+			<span class="type">
+				<xsl:value-of  select="@type" />
+			</span>
 			</p>
 			<p><span>	简介： </span>			
 			<xsl:value-of  select="desc" />

@@ -23,6 +23,16 @@ a{
 	color:#000;
 	text-decoration:none;	
 }
+table{
+	border:1px solid #aaa;
+	border-right:0px;
+	border-bottom:0px;
+}
+th,tr,td{
+	border:1px  solid #aaa;
+	border-left:0px;
+	border-top:0px;
+}
 a:link{
 	color:#aa00ff;
 	text-decoration:none;
@@ -71,22 +81,30 @@ a:visited{
 	text-align:center;
 	margin:0 auto;
 }
-
+.login a{
+	color:#0f6ec8;
+	margin-left:5px;
+}
+.login a:hover{
+	color:#ffccff;
+	margin-left:5px;
+}
 .right-side{
 	float:left;
 	margin:10px;
-	background-color:#F0E68C;
-	width:70%;
+	background-color:#F0E68C;	
+	width:80%;
 }
 .left-side{
 	float:left;
 	margin:10px;
+	width:15%;
 }
 .book{
 	border:1px solid #F5F88F;
 	float:left;
-	width:210px;
-	height:280px;
+	width:220px;
+	height:300px;
 	margin:10px;	
 }
 
@@ -94,7 +112,8 @@ a:visited{
 	float:left;
 	margin:5;
 }
-.bookinfo{
+.bookinfo {
+	
 }
 .bookinfo p{
 	color:#6eaa66;
@@ -108,6 +127,61 @@ a:visited{
 	font-size:30px;
 	color:#6eaa66;
 	text-align:center;
+}
+
+.buy{
+	border:1px solid #64ac55;
+	background-color:#b9ffaa;
+}
+.books-nav{
+	background-color:#6EAA66;
+	height:20px;
+}
+.books-nav ul li{
+	float:left;
+	margin-left:5px;
+	margin-right:5px;
+}
+.panel{
+	border:0px solid #aaa;
+	margin:5px 1px 1px 1px;
+	width:200px;
+	background-color:#F0E68C;
+	text-align:center;
+}
+.panel span{
+	margin:5 0 0 0  auto;	
+	padding:0;
+	width:100%;
+	height:20px;
+	display:block;
+	color:#aaa;
+	background-color:#F0EE8C;
+}
+.panel ul li{
+	width:90%;
+	float:left;
+}
+.panel ul li{
+	width:90%;
+	text-align:left;
+}
+.panel ul li:last-child{
+	clear:left;
+}
+.shoppingcart{
+	width:100%;
+	font-family:宋体;
+	color:#556;
+}
+.shoppingcart .total-price{
+	color:#ec8800;
+	font-size:24px;
+	font-weight:bold;
+}
+/* tools*/
+.clear-left{
+	clear:left;
 }
 
 

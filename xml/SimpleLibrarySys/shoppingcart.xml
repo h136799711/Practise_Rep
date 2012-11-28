@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xml-stylesheet type="text/xsl" href="index.xsl" ?>
+<xmlsite>
+<head>
+		<title>购物车查看</title>
+		<csslinks>
+			<href>asset/main.css</href>
+		</csslinks>
+		<scriptlinks>
+			<script href="asset/utils.js"></script>
+			<script >
+				(function(){				
+					function onload(){			
+					}
+					utils.addEvent(window,"load",onload);
+				})();
+			</script>
+		</scriptlinks>
+</head>
+<body logo="购物车查看">
+	<panel>
+		<item type="a" target="_self" href="index.xml">首页</item>
+	</panel>
+	<shoppingcart>
+		<item name="全球论剑" price="5" count="1" >
+			<img href="asset/images/1.jpg"></img>
+		</item>
+		<item name="天珠变" price="6" count="3" >
+			<img href="asset/images/2.jpg"></img>
+		</item >
+		<item name="遮天" price="7" count="2" >
+			<img href="asset/images/3.jpg"></img>
+		</item>
+		<item name="大唐皇帝李治" price="8" count="5" >
+			<img href="asset/images/4.jpg"></img>
+		</item>
+	</shoppingcart>
+</body>
+
+</xmlsite>

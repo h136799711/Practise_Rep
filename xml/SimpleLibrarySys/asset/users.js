@@ -10,17 +10,22 @@ var user = (function(){
 		if(!!!pwd || !!!name){			
 			alert("用户名或密码不能为空");
 		}
-		else if(utils.cookies.get("loginedName")){			
-			window.location.href="index.xml";
-		}else if(valid(name,pwd)){
-			utils.cookies.set("loginedName",name,1);
-			window.location.href="index.xml";
+		else if(utils.cookies.get("loginedName") || valid(name,pwd)){	
+			utils.cookies.set("loginedName",utils.cookies.get("loginedName") || name,1);
+			window.location.reload();
 		}else{
 			alert("用户名或密码错误");
 		}
 		
 	//	console.log("onLogin called");
 		ev.preventDefault();
+	};
+	var onLogout = function(ev){
+	//	alert("logout");
+		if(utils.cookies.get("loginedName")){
+			utils.cookies.set("loginedName","",-1);
+		}
+		window.location.reload();
 	};
 	var onRegister= function (ev){
 //		console.log("onRegister called");		
@@ -54,11 +59,11 @@ var user = (function(){
 	var xmlhttp; 
 	var add = function(username,pwd){
 		console.log("xmlhttp");
-		xmlhttp= new window.XMLHttpRequest();
+		xmlhttp= new  window.XMLHttpRequest();
 		var url = "data/addUser.php?";
 		url += "username="+username;
 		url+= "&password="+pwd;
-		xmlhttp.open("GET", url, false);
+		xmlhttp.open("GET", url, true);
 		xmlhttp.send(null);
 		xmlhttp.onreadystatechange=state_Change;
 			
@@ -66,10 +71,10 @@ var user = (function(){
 		{
 			if (xmlhttp.readyState==4)
 			{
-			
+				
 			  if (xmlhttp.status==200)
 				{
-					alert("已成功注册，登录不成功请稍等再试");
+					alert("已成功注册，若登录不成功请稍等再试");
 				}
 			  else
 				{
@@ -82,6 +87,7 @@ var user = (function(){
 	return {
 		onLogin:onLogin,
 		onRegister:onRegister,
+		onLogout:onLogout,
 		add:add
 	};
 })();
