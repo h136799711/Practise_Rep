@@ -63,17 +63,18 @@
 		</div>		
 		<div  class="left-side">
 		<xsl:call-template name="A"  >
-			<xsl:param name="a" select="a"/>
+			<xsl:with-param name="a" select="a"/>
 		</xsl:call-template>		
 		
 		<xsl:call-template name="Login"  >
-			<xsl:param name="login" select="login"/>
+			<xsl:with-param name="login" select="login"/>
 		</xsl:call-template>
+		<div style="font-size:16px;color:#77dddd;position:absolute;left:10px;top:10px;">在IE6.0，FireFox下通过</div>
 		<!-- search ,type-->
 		</div>
 		<div class="right-side">
 		<xsl:call-template name="Books"  >
-			<xsl:param name="book" select="book"/>
+			<xsl:with-param name="book" select="book"/>
 		</xsl:call-template>
 		</div>
 		<div style="clear:both;"></div>
