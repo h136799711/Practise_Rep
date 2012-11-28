@@ -51,6 +51,12 @@
 						
 						ele = utils.getEleById("search_btn");
 						utils.addEvent(ele,"click",onSearch);
+						
+						ele = document.createElement("div");
+						ele.innerHTML = "Copyrigtht by 何必都 @ ";
+						ele.innerHTML += (new Date()).getYear()+1900;
+						utils.getEleById("footer").appendChild(ele);						
+						
 					}
 					utils.addEvent(window,"load",onload);
 					console.log("addEvent");
@@ -165,6 +171,5 @@
 				<img href="asset/images/12.jpg"></img>
 			</book>
 			</books>
-			
 	</body>
 </xmlsite>
