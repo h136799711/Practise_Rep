@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>标题名</title>
+<meta charset="utf-8">
+<meta name="author" content="hebidu">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="generator" content="EditPlus">
+<meta name="revised" content="hebidu @2012-10-31">
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>  
+<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js">
+</script>
+<![endif]-->
+<script src="js/utils.js" type="text/javascript"></script>
+<link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+	<div id="test" >
+		<canvas id="canvas" width="960" height="720">
+			Not Support HTML5.Please Upgrade Your Browser Or Select Other Browsers.
+		</canvas>
+	</div>
+	<script type="text/javascript">
+		(function(){
+			var webgl = (function(){				
+				var getContext =function (ele){				
+					if(!window.WebGLRenderingContext){
+						alert("not support webgl.");
+						return ;
+					}
+					var ctx = ele.getContext("webgl");
+					if(!ctx){
+						ctx = ele.getContext("experimental-webgl");
+					}
+					return ctx;
+				};
+				return {
+					getContext:getContext
+				};
+			})();
+			function init(){
+				var canvas = document.getElementById("canvas");
+				console.log(webgl.getContext(canvas));
+				render();
+			}
+			function render(){
+				requestAnimFrame(render);
+				console.log("render");
+			}
+			utils.addEvent(window,"load",init);
+		})();
+	</script>
+</body>
+</html>

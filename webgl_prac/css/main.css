@@ -1,0 +1,24 @@
+html,body,div,span,h1,h2,h3,h4,h5,h6,ul,ol,li{
+	font-family:宋体;
+	padding:0;
+	border:0;
+	margin:0 auto;
+	color:#DEDE78;
+}
+body{
+	text-align:center;
+}
+#test{
+	margin:0 auto;
+	text-align:center;
+	vertical-align:middle;
+	width:990px;
+	height:740px;
+	background-color:#dd7;
+}
+#canvas{
+	border:1px solid #cdcd22;
+	background-color:#eec;
+	width:960px;
+	height:720px;
+}
