@@ -54,7 +54,7 @@
 						
 						ele = document.createElement("div");
 						ele.innerHTML = "Copyrigtht by 何必都 @ ";
-						ele.innerHTML += (new Date()).getYear()+1900;
+						ele.innerHTML += (new Date()).getFullYear();
 						utils.getEleById("footer").appendChild(ele);						
 						
 					}
