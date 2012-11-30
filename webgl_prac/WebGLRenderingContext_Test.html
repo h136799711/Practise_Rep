@@ -24,7 +24,7 @@
 	</div>
 	<script type="text/javascript">
 		(function(){
-			var webgl = (function(){				
+			var webgl = (function(){			
 				var getContext =function (ele){				
 					if(!window.WebGLRenderingContext){
 						alert("not support webgl.");
@@ -42,7 +42,26 @@
 			})();
 			function init(){
 				var canvas = document.getElementById("canvas");
-				console.log(webgl.getContext(canvas));
+				var gl = webgl.getContext(canvas);
+				console.log(gl);
+				console.log(window.devicePixelRatio);
+				console.log("alpha "+gl.alpha);
+				console.log("depth "+gl.depth);
+				console.log("stencial "+gl.stencial);
+				console.log("antialias "+gl.antialias);
+				console.log("premultipliedAlpha "+gl.premultipliedAlpha);
+				console.log("preserveDrawingBuffer "+gl.preserveDrawingBuffer);
+				console.log("===================================");
+				for(var attr in gl){
+					if(typeof gl[attr] === 'function'){
+					//	console.log(attr + " "+gl[attr]);
+					}else{	
+						console.log(attr + " "+gl[attr]);
+					}
+				}
+				console.log("===================================");
+				
+				gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 				render();
 			}
 			function render(){
