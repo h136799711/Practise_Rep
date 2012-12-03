@@ -1,4 +1,4 @@
-var utils = (function(){
+utils = (function(window){
 	var addEvent = (function () {
 	  if (document.addEventListener) {
 		return function (el, type, fn) {
@@ -51,6 +51,9 @@ var utils = (function(){
 	};
 	var getEleById = function(id){
 		return document.getElementById(id);
+	};
+	var getEle = function(id){
+		return document.getElementById(id) || document.getElementsByTagName(id);
 	};
 	function getAttrValue(ele,attrName){
 		return  ele.hasAttribute(attrName) && ele.attributes.getNamedItem(attrName).value;
@@ -127,6 +130,17 @@ var utils = (function(){
 	var getBaseURL = function(){
 		return document.URL.split("?")[0];
 	};
+		
+	var logger = (function(){
+		var write = function(msg,isAppend){
+			isAppend ? this.innerHTML += msg : this.innerHTML = msg;
+		};
+		return {
+			write:write
+		};
+	})();
+	
+	
 	return {
 		addEvent:addEvent,
 		loadXML : loadXML,
@@ -142,41 +156,13 @@ var utils = (function(){
 		show:show,
 		attr:attr,
 		getBaseURL:getBaseURL,
+		getEle:getEle,
+		logger:logger,
 		cookies:{
 			get:get,
 			set:set
 		}
 	};
 	
-})();
-
-
-window.requestAnimFrame = (function() {
-  return window.requestAnimationFrame ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame ||
-         window.oRequestAnimationFrame ||
-         window.msRequestAnimationFrame ||
-         function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-           return window.setTimeout(callback, 1000/60);
-         };
-})();
-
-/**
- * Provides cancelAnimationFrame in a cross browser way.
- */
-window.cancelAnimFrame = (function() {
-  return window.cancelAnimationFrame ||
-         window.webkitCancelAnimationFrame ||
-         window.mozCancelAnimationFrame ||
-         window.oCancelAnimationFrame ||
-         window.msCancelAnimationFrame ||
-         window.clearTimeout;
-})();
-
-
-
-
-
-
+})(window);
 
