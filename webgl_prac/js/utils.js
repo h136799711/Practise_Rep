@@ -56,9 +56,7 @@ var utils = (function(){
 		return  ele.hasAttribute(attrName) && ele.attributes.getNamedItem(attrName).value;
 	}
 	var getNode = function(xmlDoc,xPath){
-		var nodes = xmlDoc.getElementsByTagName(xPath);
-		
-		return nodes;
+		return xmlDoc.getElementsByTagName(xPath);		 
 	};
 	var createNode  = function(xmlDoc,nodeName){
 			return xmlDoc.createElement(nodeName);
