@@ -44,7 +44,7 @@ var user = (function(){
 	};
 	
 	var valid = function(username,pwd){
-		var tmp = utils.loadXML("data/users.xml");
+		var tmp = utils.loadXML("data/users.xml?"+(new Date()));
 		var data = tmp.getElementsByTagName("user");
 		console.log(data.length);
 		for(var i=0;i<data.length;i++)
